@@ -1,0 +1,6079 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#090a0c">
+<title>DropFlow — V1</title>
+
+<style>
+:root{
+    --bg:#090a0c;
+    --bg-soft:#101216;
+    --glass:rgba(255,255,255,.065);
+    --glass-hover:rgba(255,255,255,.095);
+    --glass-strong:rgba(255,255,255,.105);
+    --border:rgba(255,255,255,.105);
+    --border-strong:rgba(255,255,255,.17);
+    --text:#f5f5f7;
+    --muted:#8e929c;
+    --green:#43d98a;
+    --red:#ff6464;
+    --blue:#72a8ff;
+    --shadow:0 18px 50px rgba(0,0,0,.28);
+    --radius:20px;
+    --nav-height:68px;
+}
+
+body.light{
+    --bg:#e9ebef;
+    --bg-soft:#f5f6f8;
+    --glass:rgba(255,255,255,.52);
+    --glass-hover:rgba(255,255,255,.68);
+    --glass-strong:rgba(255,255,255,.64);
+    --border:rgba(20,25,35,.08);
+    --border-strong:rgba(20,25,35,.14);
+    --text:#15171b;
+    --muted:#6d717b;
+    --shadow:0 18px 50px rgba(40,45,60,.12);
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html{
+    min-height:100%;
+}
+
+body{
+    min-height:100vh;
+    color:var(--text);
+    background:
+        radial-gradient(circle at 10% 0%,rgba(80,110,255,.09),transparent 28%),
+        radial-gradient(circle at 90% 20%,rgba(0,210,170,.055),transparent 24%),
+        var(--bg);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Arial,sans-serif;
+    overflow-x:hidden;
+    transition:background .3s,color .3s;
+}
+
+body.light{
+    background:
+        radial-gradient(circle at 10% 0%,rgba(90,120,255,.13),transparent 30%),
+        radial-gradient(circle at 90% 20%,rgba(0,190,150,.10),transparent 25%),
+        var(--bg);
+}
+
+button,
+input,
+textarea,
+select{
+    font:inherit;
+}
+
+button{
+    color:inherit;
+    border:0;
+    cursor:pointer;
+}
+
+input,
+textarea,
+select{
+    color:var(--text);
+}
+
+.hidden{
+    display:none!important;
+}
+
+/* =========================
+   GLASS
+========================= */
+
+.glass{
+    background:var(--glass);
+    border:1px solid var(--border);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.055),
+        var(--shadow);
+    backdrop-filter:blur(24px) saturate(145%);
+    -webkit-backdrop-filter:blur(24px) saturate(145%);
+}
+
+/* =========================
+   LOGIN
+========================= */
+
+.login-screen{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.login-box{
+    width:min(410px,100%);
+    padding:30px;
+    border-radius:28px;
+}
+
+.logo{
+    font-size:25px;
+    font-weight:800;
+    letter-spacing:-.8px;
+}
+
+.login-title{
+    margin-top:35px;
+    font-size:30px;
+    letter-spacing:-1px;
+}
+
+.login-subtitle{
+    margin-top:7px;
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.5;
+}
+
+.form-group{
+    margin-top:17px;
+}
+
+.form-label{
+    display:block;
+    margin-bottom:7px;
+    color:var(--muted);
+    font-size:12px;
+}
+
+.field{
+    width:100%;
+    min-height:46px;
+    padding:12px 14px;
+    border:1px solid var(--border);
+    border-radius:14px;
+    outline:none;
+    background:rgba(255,255,255,.045);
+    transition:.2s;
+}
+
+body.light .field{
+    background:rgba(255,255,255,.5);
+}
+
+.field:focus{
+    border-color:rgba(114,168,255,.55);
+    box-shadow:0 0 0 3px rgba(114,168,255,.08);
+}
+
+textarea.field{
+    min-height:100px;
+    resize:vertical;
+}
+
+.primary-btn{
+    width:100%;
+    min-height:46px;
+    margin-top:19px;
+    border-radius:14px;
+    background:var(--text);
+    color:var(--bg);
+    font-weight:700;
+}
+
+.login-switch{
+    margin-top:16px;
+    text-align:center;
+    color:var(--muted);
+    font-size:13px;
+}
+
+.login-switch span:last-child{
+    color:var(--text);
+    cursor:pointer;
+    margin-left:4px;
+    font-weight:600;
+}
+
+/* =========================
+   APP
+========================= */
+
+#app{
+    min-height:100vh;
+    padding-bottom:105px;
+}
+
+.container{
+    width:min(1180px,100%);
+    margin:auto;
+    padding:22px 20px 30px;
+}
+
+.topbar{
+    height:58px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:25px;
+}
+
+.top-title{
+    font-size:25px;
+    font-weight:800;
+    letter-spacing:-.8px;
+}
+
+.top-subtitle{
+    margin-top:3px;
+    color:var(--muted);
+    font-size:12px;
+}
+
+.top-avatar{
+    width:42px;
+    height:42px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    background:var(--glass);
+    border:1px solid var(--border);
+    cursor:pointer;
+}
+
+.top-avatar img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+/* =========================
+   PAGES
+========================= */
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
+    animation:pageIn .2s ease;
+}
+
+@keyframes pageIn{
+    from{
+        opacity:0;
+        transform:translateY(4px);
+    }
+    to{
+        opacity:1;
+        transform:none;
+    }
+}
+
+/* =========================
+   HOME
+========================= */
+
+.home-title{
+    margin-bottom:18px;
+}
+
+.home-title h1{
+    font-size:30px;
+    letter-spacing:-1.1px;
+}
+
+.home-title p{
+    margin-top:5px;
+    color:var(--muted);
+    font-size:13px;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+}
+
+.stat{
+    min-height:120px;
+    padding:18px;
+    border-radius:19px;
+}
+
+.stat-label{
+    color:var(--muted);
+    font-size:12px;
+}
+
+.stat-value{
+    margin-top:12px;
+    font-size:25px;
+    font-weight:800;
+    letter-spacing:-.7px;
+}
+
+.green{
+    color:var(--green);
+}
+
+.red{
+    color:var(--red);
+}
+
+.blue{
+    color:var(--blue);
+}
+
+.section{
+    margin-top:24px;
+}
+
+.section-title{
+    margin-bottom:11px;
+    font-size:17px;
+    font-weight:750;
+}
+
+.today{
+    padding:18px;
+    border-radius:20px;
+}
+
+.today-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+
+.today-item{
+    padding:14px;
+    border-radius:15px;
+    background:rgba(255,255,255,.035);
+    border:1px solid var(--border);
+}
+
+.today-label{
+    color:var(--muted);
+    font-size:11px;
+}
+
+.today-value{
+    margin-top:5px;
+    font-size:18px;
+    font-weight:750;
+}
+
+.recent{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.recent-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:13px 15px;
+    border-radius:16px;
+}
+
+.recent-info{
+    flex:1;
+    min-width:0;
+}
+
+.recent-name{
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+    font-size:14px;
+    font-weight:650;
+}
+
+.recent-date{
+    margin-top:3px;
+    color:var(--muted);
+    font-size:11px;
+}
+
+.recent-profit{
+    color:var(--green);
+    font-size:13px;
+    font-weight:700;
+}
+
+/* =========================
+   ASSORTMENT
+========================= */
+
+.toolbar{
+    display:flex;
+    gap:9px;
+    margin-bottom:12px;
+}
+
+.search{
+    flex:1;
+    position:relative;
+}
+
+.search input{
+    padding-left:38px;
+}
+
+.search-icon{
+    position:absolute;
+    left:14px;
+    top:50%;
+    transform:translateY(-50%);
+    color:var(--muted);
+    font-size:17px;
+}
+
+.add-button{
+    min-width:125px;
+    padding:0 17px;
+    border-radius:14px;
+    background:var(--glass-strong);
+    border:1px solid var(--border-strong);
+    font-weight:650;
+}
+
+.filters{
+    display:flex;
+    gap:7px;
+    overflow-x:auto;
+    scrollbar-width:none;
+    margin-bottom:15px;
+}
+
+.filters::-webkit-scrollbar{
+    display:none;
+}
+
+.filter{
+    padding:8px 13px;
+    border-radius:12px;
+    background:var(--glass);
+    border:1px solid var(--border);
+    color:var(--muted);
+    white-space:nowrap;
+    font-size:12px;
+}
+
+.filter.active{
+    color:var(--text);
+    border-color:var(--border-strong);
+    background:var(--glass-strong);
+}
+
+.products{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+}
+
+.product{
+    overflow:hidden;
+    border-radius:20px;
+}
+
+.product-image{
+    height:220px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(255,255,255,.025);
+    overflow:hidden;
+}
+
+.product-image img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.no-image{
+    color:var(--muted);
+    font-size:12px;
+}
+
+.product-content{
+    padding:15px;
+}
+
+.product-name{
+    font-size:16px;
+    font-weight:700;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.product-date{
+    margin-top:3px;
+    color:var(--muted);
+    font-size:11px;
+}
+
+.product-description{
+    margin-top:9px;
+    color:var(--muted);
+    font-size:11px;
+    line-height:1.45;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+}
+
+.product-info{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+    margin-top:13px;
+}
+
+.info-cell{
+    padding:9px 10px;
+    border-radius:12px;
+    background:rgba(255,255,255,.035);
+    border:1px solid var(--border);
+}
+
+.info-label{
+    color:var(--muted);
+    font-size:10px;
+}
+
+.info-value{
+    margin-top:3px;
+    font-size:13px;
+    font-weight:650;
+}
+
+.product-actions{
+    display:grid;
+    grid-template-columns:1.2fr 1fr 1fr;
+    gap:6px;
+    margin-top:9px;
+}
+
+.product-actions.second{
+    grid-template-columns:1fr;
+}
+
+.action{
+    min-height:36px;
+    padding:7px 5px;
+    border-radius:11px;
+    background:rgba(255,255,255,.05);
+    border:1px solid var(--border);
+    font-size:11px;
+}
+
+.action.sell{
+    color:var(--green);
+    background:rgba(67,217,138,.08);
+}
+
+.action.delete{
+    color:var(--red);
+}
+
+/* =========================
+   STATISTICS
+========================= */
+
+.stats-controls{
+    display:flex;
+    gap:7px;
+    overflow-x:auto;
+    scrollbar-width:none;
+    margin-bottom:9px;
+}
+
+.stats-controls::-webkit-scrollbar{
+    display:none;
+}
+
+.control{
+    padding:9px 14px;
+    border-radius:12px;
+    background:var(--glass);
+    border:1px solid var(--border);
+    color:var(--muted);
+    white-space:nowrap;
+    font-size:12px;
+}
+
+.control.active{
+    color:var(--text);
+    background:var(--glass-strong);
+    border-color:var(--border-strong);
+}
+
+.chart-box{
+    padding:18px;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.chart-head{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:25px;
+}
+
+.chart-total{
+    font-size:27px;
+    font-weight:800;
+}
+
+.chart-description{
+    margin-top:3px;
+    color:var(--muted);
+    font-size:11px;
+}
+
+.chart-period{
+    color:var(--muted);
+    font-size:11px;
+}
+
+.chart-scroll{
+    overflow-x:auto;
+    scrollbar-width:thin;
+    padding-bottom:12px;
+}
+
+.chart{
+    min-width:650px;
+    height:300px;
+    display:flex;
+    align-items:flex-end;
+    gap:6px;
+    border-bottom:1px solid var(--border);
+    padding:0 5px;
+}
+
+.bar-wrap{
+    flex:1;
+    min-width:25px;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-end;
+    gap:6px;
+}
+
+.bar-number{
+    height:12px;
+    color:var(--muted);
+    font-size:8px;
+    white-space:nowrap;
+}
+
+.bar{
+    width:17px;
+    min-height:2px;
+    border-radius:6px 6px 2px 2px;
+    background:linear-gradient(
+        to top,
+        #72a8ff,
+        rgba(114,168,255,.28)
+    );
+}
+
+.bar-date{
+    height:22px;
+    color:var(--muted);
+    font-size:8px;
+    white-space:nowrap;
+    transform:rotate(-45deg);
+    transform-origin:center;
+}
+
+.stat-summary{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:9px;
+    margin-top:10px;
+}
+
+.summary-item{
+    padding:14px;
+    border-radius:16px;
+}
+
+.summary-label{
+    color:var(--muted);
+    font-size:10px;
+}
+
+.summary-value{
+    margin-top:5px;
+    font-size:15px;
+    font-weight:750;
+}
+
+/* =========================
+   ACCOUNT
+========================= */
+
+.profile{
+    padding:20px;
+    border-radius:22px;
+}
+
+.profile-top{
+    display:flex;
+    align-items:center;
+    gap:13px;
+}
+
+.profile-avatar{
+    width:65px;
+    height:65px;
+    border-radius:19px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    background:var(--glass-strong);
+    border:1px solid var(--border);
+    font-size:22px;
+}
+
+.profile-avatar img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.profile-name{
+    font-size:21px;
+    font-weight:800;
+}
+
+.profile-date{
+    margin-top:3px;
+    color:var(--muted);
+    font-size:11px;
+}
+
+.profile-stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-top:17px;
+}
+
+.profile-stat{
+    padding:11px;
+    border-radius:14px;
+    background:rgba(255,255,255,.035);
+    border:1px solid var(--border);
+}
+
+.profile-stat-label{
+    color:var(--muted);
+    font-size:10px;
+}
+
+.profile-stat-value{
+    margin-top:4px;
+    font-size:14px;
+    font-weight:750;
+}
+
+.settings{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.setting{
+    padding:15px;
+    border-radius:17px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    cursor:pointer;
+}
+
+.setting-title{
+    font-size:13px;
+    font-weight:650;
+}
+
+.setting-sub{
+    margin-top:3px;
+    color:var(--muted);
+    font-size:11px;
+}
+
+.setting-arrow{
+    color:var(--muted);
+    font-size:18px;
+}
+
+.theme-row{
+    display:flex;
+    gap:7px;
+    margin-top:8px;
+}
+
+.theme-button{
+    flex:1;
+    min-height:39px;
+    border-radius:12px;
+    background:var(--glass);
+    border:1px solid var(--border);
+    color:var(--muted);
+    font-size:11px;
+}
+
+.theme-button.active{
+    color:var(--text);
+    background:var(--glass-strong);
+    border-color:var(--border-strong);
+}
+
+.logout{
+    width:100%;
+    min-height:44px;
+    margin-top:17px;
+    border-radius:14px;
+    background:var(--glass);
+    border:1px solid var(--border);
+}
+
+/* =========================
+   BOTTOM NAV
+========================= */
+
+ .v1-hidden-setting{
+    display:none !important;
+}
+
+.bottom-nav{
+    position:fixed;
+    left:50%;
+    bottom:14px;
+    transform:translateX(-50%);
+    width:min(620px,calc(100% - 28px));
+    height:var(--nav-height);
+    padding:5px;
+    border-radius:20px;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:4px;
+    z-index:100;
+}
+
+.nav-button{
+    height:100%;
+    border-radius:15px;
+    background:transparent;
+    color:var(--muted);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:12px;
+    transition:.2s;
+}
+
+.nav-button.active{
+    color:var(--text);
+    background:var(--glass-strong);
+    border:1px solid var(--border);
+}
+
+/* =========================
+   MODALS
+========================= */
+
+.overlay{
+    position:fixed;
+    inset:0;
+    z-index:200;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    background:rgba(0,0,0,.5);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+}
+
+.overlay.show{
+    display:flex;
+}
+
+.modal{
+    width:min(560px,100%);
+    max-height:90vh;
+    overflow-y:auto;
+    padding:22px;
+    border-radius:23px;
+}
+
+.modal-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:18px;
+}
+
+.modal-title{
+    font-size:21px;
+    font-weight:800;
+}
+
+.close{
+    width:35px;
+    height:35px;
+    border-radius:11px;
+    background:var(--glass);
+    border:1px solid var(--border);
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:11px;
+}
+
+.full{
+    grid-column:1/-1;
+}
+
+.photo-preview{
+    width:100%;
+    height:160px;
+    margin-top:8px;
+    border-radius:15px;
+    border:1px dashed var(--border-strong);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    color:var(--muted);
+    font-size:12px;
+}
+
+.photo-preview img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.profit-preview{
+    margin-top:13px;
+    padding:13px;
+    border-radius:15px;
+    background:rgba(67,217,138,.07);
+    border:1px solid rgba(67,217,138,.14);
+}
+
+.profit-label{
+    color:var(--muted);
+    font-size:10px;
+}
+
+.profit-value{
+    margin-top:3px;
+    color:var(--green);
+    font-size:19px;
+    font-weight:800;
+}
+
+.modal-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    margin-top:16px;
+}
+
+.modal-button{
+    min-height:44px;
+    border-radius:13px;
+}
+
+.modal-button.cancel{
+    background:var(--glass);
+    border:1px solid var(--border);
+}
+
+.modal-button.save{
+    background:var(--text);
+    color:var(--bg);
+    font-weight:700;
+}
+
+/* =========================
+   HISTORY / ACCOUNTS
+========================= */
+
+.history{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+}
+
+.history-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:13px;
+    border-radius:14px;
+    background:rgba(255,255,255,.035);
+    border:1px solid var(--border);
+}
+
+.history-number{
+    color:var(--muted);
+    font-size:10px;
+}
+
+.history-date{
+    margin-top:3px;
+    font-size:13px;
+    font-weight:650;
+}
+
+.history-profit{
+    color:var(--green);
+    font-size:12px;
+    font-weight:700;
+}
+
+.account-list{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+}
+
+.account-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:13px;
+    border-radius:15px;
+    background:rgba(255,255,255,.035);
+    border:1px solid var(--border);
+    cursor:pointer;
+}
+
+.account-item.current{
+    border-color:rgba(67,217,138,.35);
+}
+
+.account-info{
+    flex:1;
+}
+
+.account-name{
+    font-size:13px;
+    font-weight:650;
+}
+
+.account-products{
+    margin-top:2px;
+    color:var(--muted);
+    font-size:10px;
+}
+
+/* =========================
+   EMPTY / TOAST
+========================= */
+
+.empty{
+    padding:35px 20px;
+    text-align:center;
+    color:var(--muted);
+    border-radius:18px;
+}
+
+.empty-title{
+    color:var(--text);
+    font-size:14px;
+    font-weight:650;
+    margin-bottom:4px;
+}
+
+.toast{
+    position:fixed;
+    z-index:500;
+    left:50%;
+    bottom:94px;
+    transform:translate(-50%,15px);
+    opacity:0;
+    pointer-events:none;
+    padding:11px 16px;
+    border-radius:13px;
+    background:rgba(25,26,30,.88);
+    border:1px solid rgba(255,255,255,.12);
+    backdrop-filter:blur(18px);
+    color:#fff;
+    font-size:12px;
+    transition:.2s;
+}
+
+.toast.show{
+    opacity:1;
+    transform:translate(-50%,0);
+}
+
+/* =========================
+   DESKTOP
+========================= */
+
+@media(min-width:901px){
+
+    .product:hover{
+        transform:translateY(-2px);
+        transition:.2s;
+    }
+
+    .setting:hover,
+    .recent-item:hover,
+    .action:hover,
+    .filter:hover,
+    .control:hover{
+        background:var(--glass-hover);
+    }
+}
+
+/* =========================
+   TABLET
+========================= */
+
+@media(max-width:900px){
+
+    .stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .products{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .stat-summary{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+
+/* =========================
+   PHONE
+========================= */
+
+@media(max-width:600px){
+
+    #app{
+        padding-bottom:94px;
+    }
+
+    .container{
+        padding:15px 12px 25px;
+    }
+
+    .topbar{
+        height:48px;
+        margin-bottom:19px;
+    }
+
+    .top-title{
+        font-size:21px;
+    }
+
+    .top-subtitle{
+        font-size:10px;
+    }
+
+    .top-avatar{
+        width:38px;
+        height:38px;
+        border-radius:12px;
+    }
+
+    .home-title h1{
+        font-size:25px;
+    }
+
+    .stats{
+        gap:8px;
+    }
+
+    .stat{
+        min-height:105px;
+        padding:14px;
+        border-radius:16px;
+    }
+
+    .stat-value{
+        font-size:20px;
+        margin-top:9px;
+    }
+
+    .today{
+        padding:13px;
+    }
+
+    .today-grid{
+        gap:6px;
+    }
+
+    .today-item{
+        padding:10px;
+    }
+
+    .today-value{
+        font-size:15px;
+    }
+
+    .toolbar{
+        gap:7px;
+    }
+
+    .add-button{
+        min-width:96px;
+        padding:0 10px;
+        font-size:11px;
+    }
+
+    .products{
+        grid-template-columns:1fr;
+        gap:9px;
+    }
+
+    .product{
+        display:grid;
+        grid-template-columns:120px 1fr;
+    }
+
+    .product-image{
+        height:100%;
+        min-height:155px;
+    }
+
+    .product-content{
+        padding:12px;
+    }
+
+    .product-name{
+        font-size:14px;
+    }
+
+    .product-description{
+        font-size:10px;
+        line-height:1.4;
+        display:-webkit-box;
+        -webkit-box-orient:vertical;
+        -webkit-line-clamp:5;
+        overflow:hidden;
+    }
+
+    .product-info{
+        gap:5px;
+        margin-top:9px;
+    }
+
+    .info-cell{
+        padding:7px;
+    }
+
+    .info-value{
+        font-size:11px;
+    }
+
+    .product-actions{
+        margin-top:7px;
+    }
+
+    .action{
+        min-height:32px;
+        font-size:9px;
+    }
+
+    .chart-box{
+        padding:13px;
+    }
+
+    .chart{
+        min-width:620px;
+        height:260px;
+    }
+
+    .stat-summary{
+        gap:7px;
+    }
+
+    .summary-item{
+        padding:11px;
+    }
+
+    .summary-value{
+        font-size:13px;
+    }
+
+    .profile{
+        padding:15px;
+    }
+
+    .profile-avatar{
+        width:57px;
+        height:57px;
+    }
+
+    .profile-name{
+        font-size:18px;
+    }
+
+    .bottom-nav{
+        width:calc(100% - 20px);
+        bottom:max(7px,env(safe-area-inset-bottom));
+        height:60px;
+        border-radius:18px;
+        padding:4px;
+        gap:3px;
+    }
+
+    .nav-button{
+        border-radius:14px;
+        font-size:10px;
+    }
+
+    .modal{
+        padding:17px;
+        border-radius:20px;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .full{
+        grid-column:auto;
+    }
+
+    .modal-title{
+        font-size:19px;
+    }
+}
+
+@media(max-width:390px){
+
+    .product{
+        grid-template-columns:105px 1fr;
+    }
+
+    .product-image{
+        min-height:150px;
+    }
+
+    .product-actions{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .product-actions .sell{
+        grid-column:1/-1;
+    }
+
+    .nav-button{
+        font-size:9px;
+    }
+}
+</style>
+
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0b0b0d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DropFlow">
+</head>
+
+<body>
+
+<!-- LOGIN -->
+
+<section id="loginScreen" class="login-screen">
+
+    <div id="loginBox" class="login-box glass">
+
+        <div class="logo">DropFlow</div>
+
+        <h1 class="login-title" id="loginTitle">
+            Введите пароль
+        </h1>
+
+        <p class="login-subtitle" id="loginSubtitle">
+            Пароль предоставлен владельцем приложения.
+        </p>
+
+        <form id="loginForm">
+
+            <div class="form-group">
+                <label class="form-label">Пароль доступа</label>
+                <input
+                    class="field"
+                    id="loginPassword"
+                    type="password"
+                    autocomplete="off"
+                    placeholder="Введите пароль"
+                    required
+                >
+            </div>
+
+            <button
+                class="primary-btn"
+                type="button"
+                id="loginButton"
+            >
+                Войти
+            </button>
+
+        </form>
+
+    </div>
+
+</section>
+
+
+<!-- APP -->
+
+<div id="app" class="hidden">
+
+    <div class="container">
+
+        <header class="topbar">
+
+            <div>
+                <div class="top-title" id="topTitle">
+                    Главное
+                </div>
+
+                <div class="top-subtitle" id="topSubtitle">
+                    Обзор магазина
+                </div>
+            </div>
+
+            <div
+                class="top-avatar"
+                onclick="showPage('account')"
+            >
+                <span id="topAvatarText">П</span>
+                <img
+                    id="topAvatarImg"
+                    class="hidden"
+                >
+            </div>
+
+        </header>
+
+
+        <!-- ГЛАВНОЕ -->
+
+        <main id="homePage" class="page active">
+
+            <div class="home-title">
+
+                <h1 id="welcomeName">
+                    Привет
+                </h1>
+
+                <p>
+                    Краткий обзор твоего магазина.
+                </p>
+
+            </div>
+
+
+            <div class="stats">
+
+                <div class="stat glass">
+                    <div class="stat-label">
+                        Чистая прибыль
+                    </div>
+
+                    <div
+                        class="stat-value green"
+                        id="dashboardProfit"
+                    >
+                        0 ₽
+                    </div>
+                </div>
+
+
+                <div class="stat glass">
+                    <div class="stat-label">
+                        Продажи
+                    </div>
+
+                    <div
+                        class="stat-value blue"
+                        id="dashboardSales"
+                    >
+                        0
+                    </div>
+                </div>
+
+
+                <div class="stat glass">
+                    <div class="stat-label">
+                        Выручка
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="dashboardRevenue"
+                    >
+                        0 ₽
+                    </div>
+                </div>
+
+
+                <div class="stat glass">
+                    <div class="stat-label">
+                        Расходы
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="dashboardExpenses"
+                    >
+                        0 ₽
+                    </div>
+                </div>
+
+
+                <div class="stat glass">
+                    <div class="stat-label">
+                        Товаров
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="dashboardProducts"
+                    >
+                        0
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="section">
+
+                <div class="section-title">
+                    Сегодня
+                </div>
+
+                <div class="today glass">
+
+                    <div class="today-grid">
+
+                        <div class="today-item">
+                            <div class="today-label">
+                                Продажи
+                            </div>
+
+                            <div
+                                class="today-value"
+                                id="todaySales"
+                            >
+                                0
+                            </div>
+                        </div>
+
+
+                        <div class="today-item">
+                            <div class="today-label">
+                                Выручка
+                            </div>
+
+                            <div
+                                class="today-value"
+                                id="todayRevenue"
+                            >
+                                0 ₽
+                            </div>
+                        </div>
+
+
+                        <div class="today-item">
+                            <div class="today-label">
+                                Расходы
+                            </div>
+
+                            <div
+                                class="today-value"
+                                id="todayExpenses"
+                            >
+                                0 ₽
+                            </div>
+                        </div>
+
+
+                        <div class="today-item">
+                            <div class="today-label">
+                                Прибыль
+                            </div>
+
+                            <div
+                                class="today-value green"
+                                id="todayProfit"
+                            >
+                                0 ₽
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="section">
+
+                <div class="section-title">
+                    Последние продажи
+                </div>
+
+                <div
+                    id="recentActivity"
+                    class="recent"
+                ></div>
+
+            </div>
+
+        </main>
+
+
+        <!-- АССОРТИМЕНТ -->
+
+        <main id="assortmentPage" class="page">
+
+            <div class="toolbar">
+
+                <div class="search">
+
+                    <span class="search-icon">
+                        ⌕
+                    </span>
+
+                    <input
+                        class="field"
+                        id="searchInput"
+                        placeholder="Поиск товара"
+                        oninput="renderProducts()"
+                    >
+
+                </div>
+
+                <button
+                    class="add-button"
+                    onclick="openAddModal()"
+                >
+                    Добавить
+                </button>
+
+            </div>
+
+
+            <div class="filters">
+
+                <button
+                    class="filter active"
+                    onclick="changeProductFilter('all',this)"
+                >
+                    Все
+                </button>
+
+                <button
+                    class="filter"
+                    onclick="changeProductFilter('sold',this)"
+                >
+                    С продажами
+                </button>
+
+                <button
+                    class="filter"
+                    onclick="changeProductFilter('unsold',this)"
+                >
+                    Без продаж
+                </button>
+
+                <button
+                    class="filter"
+                    onclick="changeProductFilter('profit',this)"
+                >
+                    По прибыли
+                </button>
+
+                <button
+                    class="filter"
+                    onclick="changeProductFilter('new',this)"
+                >
+                    Новые
+                </button>
+
+            </div>
+
+
+            <div
+                id="productsGrid"
+                class="products"
+            ></div>
+
+        </main>
+
+
+        <!-- СТАТИСТИКА -->
+
+        <main id="statisticsPage" class="page">
+
+            <div class="stats-controls">
+
+                <button
+                    class="control active"
+                    onclick="changePeriod(7,this)"
+                >
+                    7 дней
+                </button>
+
+                <button
+                    class="control"
+                    onclick="changePeriod(30,this)"
+                >
+                    30 дней
+                </button>
+
+                <button
+                    class="control"
+                    onclick="changePeriod(180,this)"
+                >
+                    6 месяцев
+                </button>
+
+                <button
+                    class="control"
+                    onclick="changePeriod(365,this)"
+                >
+                    1 год
+                </button>
+
+            </div>
+
+
+            <div class="stats-controls">
+
+                <button
+                    class="control active"
+                    onclick="changeMetric('sales',this)"
+                >
+                    Продажи
+                </button>
+
+                <button
+                    class="control"
+                    onclick="changeMetric('revenue',this)"
+                >
+                    Выручка
+                </button>
+
+                <button
+                    class="control"
+                    onclick="changeMetric('profit',this)"
+                >
+                    Прибыль
+                </button>
+
+                <button
+                    class="control"
+                    onclick="changeMetric('expenses',this)"
+                >
+                    Расходы
+                </button>
+
+            </div>
+
+
+            <div class="chart-box glass">
+
+                <div class="chart-head">
+
+                    <div>
+
+                        <div
+                            class="chart-total"
+                            id="chartTotal"
+                        >
+                            0
+                        </div>
+
+                        <div
+                            class="chart-description"
+                            id="chartCaption"
+                        >
+                            Продаж за период
+                        </div>
+
+                    </div>
+
+                    <div
+                        class="chart-period"
+                        id="chartPeriodLabel"
+                    >
+                        7 дней
+                    </div>
+
+                </div>
+
+
+                <div class="chart-scroll">
+
+                    <div
+                        id="chart"
+                        class="chart"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-summary">
+
+                <div class="summary-item glass">
+                    <div class="summary-label">
+                        Среднее в день
+                    </div>
+
+                    <div
+                        class="summary-value"
+                        id="averageStat"
+                    >
+                        0
+                    </div>
+                </div>
+
+
+                <div class="summary-item glass">
+                    <div class="summary-label">
+                        Лучший день
+                    </div>
+
+                    <div
+                        class="summary-value"
+                        id="bestDayStat"
+                    >
+                        —
+                    </div>
+                </div>
+
+
+                <div class="summary-item glass">
+                    <div class="summary-label">
+                        Средний чек
+                    </div>
+
+                    <div
+                        class="summary-value"
+                        id="averageCheckStat"
+                    >
+                        0 ₽
+                    </div>
+                </div>
+
+
+                <div class="summary-item glass">
+                    <div class="summary-label">
+                        Продано
+                    </div>
+
+                    <div
+                        class="summary-value"
+                        id="periodSalesStat"
+                    >
+                        0
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="section">
+
+                <div class="section-title">
+                    Прибыльные товары
+                </div>
+
+                <div
+                    id="bestProducts"
+                    class="recent"
+                ></div>
+
+            </div>
+
+        </main>
+
+
+        <!-- АККАУНТ -->
+
+        <main id="accountPage" class="page">
+
+            <div class="profile glass">
+
+                <div class="profile-top">
+
+                    <div class="profile-avatar">
+
+                        <span id="profileAvatarText">
+                            П
+                        </span>
+
+                        <img
+                            id="profileAvatarImg"
+                            class="hidden"
+                        >
+
+                    </div>
+
+
+                    <div>
+
+                        <div
+                            class="profile-name"
+                            id="profileName"
+                        >
+                            —
+                        </div>
+
+                        <div
+                            class="profile-date"
+                            id="profileDate"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="profile-stats">
+
+                    <div class="profile-stat">
+
+                        <div class="profile-stat-label">
+                            Товаров
+                        </div>
+
+                        <div
+                            class="profile-stat-value"
+                            id="profileProducts"
+                        >
+                            0
+                        </div>
+
+                    </div>
+
+
+                    <div class="profile-stat">
+
+                        <div class="profile-stat-label">
+                            Продаж
+                        </div>
+
+                        <div
+                            class="profile-stat-value"
+                            id="profileSales"
+                        >
+                            0
+                        </div>
+
+                    </div>
+
+
+                    <div class="profile-stat">
+
+                        <div class="profile-stat-label">
+                            Прибыль
+                        </div>
+
+                        <div
+                            class="profile-stat-value green"
+                            id="profileProfit"
+                        >
+                            0 ₽
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="section">
+
+                <div class="section-title">
+                    Внешний вид
+                </div>
+
+                <div class="theme-row">
+
+                    <button
+                        class="theme-button"
+                        data-theme="dark"
+                        onclick="setTheme('dark')"
+                    >
+                        Тёмная
+                    </button>
+
+                    <button
+                        class="theme-button"
+                        data-theme="light"
+                        onclick="setTheme('light')"
+                    >
+                        Светлая
+                    </button>
+
+                    <button
+                        class="theme-button"
+                        data-theme="system"
+                        onclick="setTheme('system')"
+                    >
+                        Системная
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="section">
+
+                <div class="section-title">
+                    Настройки
+                </div>
+
+                <div class="settings">
+
+                    <div
+                        class="setting glass"
+                        onclick="editProfile()"
+                    >
+                        <div>
+                            <div class="setting-title">
+                                Профиль
+                            </div>
+
+                            <div class="setting-sub">
+                                Изменить имя и аватар
+                            </div>
+                        </div>
+
+                        <div class="setting-arrow">
+                            ›
+                        </div>
+                    </div>
+
+
+                    <div
+                        class="setting glass v1-hidden-setting"
+                        onclick="showAccountsModal()"
+                    >
+                        <div>
+                            <div class="setting-title">
+                                Аккаунты
+                            </div>
+
+                            <div class="setting-sub">
+                                Переключить аккаунт
+                            </div>
+                        </div>
+
+                        <div class="setting-arrow">
+                            ›
+                        </div>
+                    </div>
+
+
+                    <div
+                        class="setting glass"
+                        onclick="exportCSV()"
+                    >
+                        <div>
+                            <div class="setting-title">
+                                Экспорт
+                            </div>
+
+                            <div class="setting-sub">
+                                Скачать данные товаров
+                            </div>
+                        </div>
+
+                        <div class="setting-arrow">
+                            ›
+                        </div>
+                    </div>
+
+
+                    <div
+                        class="setting glass"
+                        onclick="backupData()"
+                    >
+                        <div>
+                            <div class="setting-title">
+                                Резервная копия
+                            </div>
+
+                            <div class="setting-sub">
+                                Сохранить данные аккаунта
+                            </div>
+                        </div>
+
+                        <div class="setting-arrow">
+                            ›
+                        </div>
+                    </div>
+
+
+                    <div
+                        class="setting glass"
+                        onclick="document.getElementById('restoreFile').click()"
+                    >
+                        <div>
+                            <div class="setting-title">
+                                Восстановление
+                            </div>
+
+                            <div class="setting-sub">
+                                Загрузить резервную копию
+                            </div>
+                        </div>
+
+                        <div class="setting-arrow">
+                            ›
+                        </div>
+                    </div>
+
+                    <input
+                        id="restoreFile"
+                        class="hidden"
+                        type="file"
+                        accept="application/json,.json"
+                        onchange="restoreData(event)"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="section">
+
+                <div class="section-title">
+                    Данные
+                </div>
+
+                <div class="settings">
+
+                    <div
+                        class="setting glass"
+                        onclick="deleteAllCurrentData()"
+                    >
+                        <div>
+                            <div class="setting-title">
+                                Удалить все данные
+                            </div>
+
+                            <div class="setting-sub">
+                                Товары и история продаж
+                            </div>
+                        </div>
+
+                        <div class="setting-arrow">
+                            ›
+                        </div>
+                    </div>
+
+
+                    <div
+                        class="setting glass"
+                        onclick="deleteCurrentAccount()"
+                    >
+                        <div>
+                            <div class="setting-title red">
+                                Удалить аккаунт
+                            </div>
+
+                            <div class="setting-sub">
+                                Удаление аккаунта и товаров
+                            </div>
+                        </div>
+
+                        <div class="setting-arrow">
+                            ›
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <button
+                class="logout"
+                onclick="logout()"
+            >
+                Выйти
+            </button>
+
+        </main>
+
+    </div>
+
+
+    <!-- ОДНА ПОЛОСКА НАВИГАЦИИ -->
+
+    <nav class="bottom-nav glass">
+
+        <button
+            class="nav-button active"
+            data-page="home"
+            onclick="showPage('home')"
+        >
+            Главное
+        </button>
+
+        <button
+            class="nav-button"
+            data-page="assortment"
+            onclick="showPage('assortment')"
+        >
+            Ассортимент
+        </button>
+
+        <button
+            class="nav-button"
+            data-page="statistics"
+            onclick="showPage('statistics')"
+        >
+            Статистика
+        </button>
+
+        <button
+            class="nav-button"
+            data-page="account"
+            onclick="showPage('account')"
+        >
+            Аккаунт
+        </button>
+
+    </nav>
+
+</div>
+
+
+<!-- PRODUCT MODAL -->
+
+<div
+    class="overlay"
+    id="productOverlay"
+>
+
+    <div class="modal glass">
+
+        <div class="modal-head">
+
+            <div
+                class="modal-title"
+                id="productModalTitle"
+            >
+                Новый товар
+            </div>
+
+            <button
+                class="close"
+                onclick="closeProductModal()"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <form id="productForm">
+
+            <input
+                type="hidden"
+                id="productId"
+            >
+
+            <div class="form-grid">
+
+                <div class="form-group full">
+
+                    <label class="form-label">
+                        Название
+                    </label>
+
+                    <input
+                        class="field"
+                        id="productName"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label class="form-label">
+                        Стоимость закупа
+                    </label>
+
+                    <input
+                        class="field"
+                        id="purchase"
+                        inputmode="decimal"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label class="form-label">
+                        Цена продажи
+                    </label>
+
+                    <input
+                        class="field"
+                        id="sale"
+                        inputmode="decimal"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label class="form-label">
+                        Комиссия Авито (%)
+                    </label>
+
+                    <input
+                        class="field"
+                        id="commission"
+                        inputmode="decimal"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label class="form-label">
+                        Доставка
+                    </label>
+
+                    <input
+                        class="field"
+                        id="delivery"
+                        inputmode="decimal"
+                    >
+
+                </div>
+
+
+                <div class="form-group full">
+
+                    <label class="form-label">
+                        Дата публикации
+                    </label>
+
+                    <input
+                        class="field"
+                        id="createdDate"
+                        type="date"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group full">
+
+                    <label class="form-label">
+                        Фото
+                    </label>
+
+                    <input
+                        class="field"
+                        id="photo"
+                        type="file"
+                        accept="image/*"
+                        onchange="previewPhoto(event)"
+                    >
+
+                    <div
+                        class="photo-preview"
+                        id="photoPreview"
+                    >
+                        Фото не выбрано
+                    </div>
+
+                </div>
+
+
+                <div class="form-group full">
+
+                    <label class="form-label">
+                        Описание
+                    </label>
+
+                    <textarea
+                        class="field"
+                        id="description"
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+
+            <div class="profit-preview">
+
+                <div class="profit-label">
+                    Чистая прибыль
+                </div>
+
+                <div
+                    class="profit-value"
+                    id="profitPreview"
+                >
+                    0 ₽
+                </div>
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="modal-button cancel"
+                    onclick="closeProductModal()"
+                >
+                    Отмена
+                </button>
+
+                <button
+                    type="submit"
+                    class="modal-button save"
+                >
+                    Сохранить
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- HISTORY -->
+
+<div
+    class="overlay"
+    id="historyOverlay"
+>
+
+    <div class="modal glass">
+
+        <div class="modal-head">
+
+            <div>
+
+                <div class="modal-title">
+                    История продаж
+                </div>
+
+                <div
+                    id="historyProductName"
+                    class="chart-description"
+                ></div>
+
+            </div>
+
+            <button
+                class="close"
+                onclick="closeHistory()"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div
+            id="historyList"
+            class="history"
+        ></div>
+
+
+        <div class="modal-actions">
+
+            <button
+                class="modal-button cancel"
+                onclick="closeHistory()"
+            >
+                Закрыть
+            </button>
+
+            <button
+                class="modal-button save"
+                onclick="undoLastSale()"
+            >
+                Отменить последнюю
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ACCOUNTS -->
+
+<div
+    class="overlay"
+    id="accountsOverlay"
+>
+
+    <div class="modal glass">
+
+        <div class="modal-head">
+
+            <div class="modal-title">
+                Аккаунты
+            </div>
+
+            <button
+                class="close"
+                onclick="closeAccountsModal()"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div
+            id="accountsList"
+            class="account-list"
+        ></div>
+
+
+        <button
+            class="primary-btn"
+            onclick="createAccountFromApp()"
+        >
+            Создать аккаунт
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- PROFILE -->
+
+<div
+    class="overlay"
+    id="profileOverlay"
+>
+
+    <div class="modal glass">
+
+        <div class="modal-head">
+
+            <div class="modal-title">
+                Профиль
+            </div>
+
+            <button
+                class="close"
+                onclick="closeProfileModal()"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label class="form-label">
+                Имя
+            </label>
+
+            <input
+                class="field"
+                id="editName"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label class="form-label">
+                Аватар
+            </label>
+
+            <input
+                class="field"
+                id="avatarFile"
+                type="file"
+                accept="image/*"
+                onchange="previewAvatar(event)"
+            >
+
+        </div>
+
+
+        <div
+            class="photo-preview"
+            id="avatarPreview"
+        >
+            Аватар не выбран
+        </div>
+
+
+        <div class="modal-actions">
+
+            <button
+                class="modal-button cancel"
+                onclick="closeProfileModal()"
+            >
+                Отмена
+            </button>
+
+            <button
+                class="modal-button save"
+                onclick="saveProfile()"
+            >
+                Сохранить
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div
+    class="toast"
+    id="toast"
+></div>
+
+
+<script>
+const STORAGE_KEY = "dropflow_accounts_v1";
+const CURRENT_KEY = "dropflow_current_v1";
+const THEME_KEY = "dropflow_theme_v1";
+
+let accounts = {};
+let currentAccountId = null;
+let products = [];
+
+let currentPeriod = 7;
+let currentMetric = "sales";
+let productFilter = "all";
+let historyProductId = null;
+
+let tempPhoto = "";
+let tempAvatar = "";
+let mediaStorageReady = false;
+let ownerAuthorizedFromDB = false;
+let toastTimer;
+
+
+/* =========================
+   UTILS
+========================= */
+
+function parseNumber(value){
+
+    if(value === null || value === undefined){
+        return 0;
+    }
+
+    const cleaned =
+        String(value)
+            .replace(/\s/g,"")
+            .replace(",",".")
+            .replace(/[^\d.-]/g,"");
+
+    const result = parseFloat(cleaned);
+
+    return Number.isFinite(result)
+        ? result
+        : 0;
+}
+
+
+function money(value){
+
+    return new Intl.NumberFormat("ru-RU",{
+        maximumFractionDigits:2
+    }).format(Number(value) || 0) + " ₽";
+}
+
+
+function localDateKey(date = new Date()){
+
+    const d = new Date(date);
+
+    return [
+        d.getFullYear(),
+        String(d.getMonth()+1).padStart(2,"0"),
+        String(d.getDate()).padStart(2,"0")
+    ].join("-");
+}
+
+
+function parseDateKey(key){
+
+    const [y,m,d] =
+        key.split("-").map(Number);
+
+    return new Date(y,m-1,d);
+}
+
+
+function addDays(date,amount){
+
+    const d = new Date(date);
+
+    d.setDate(
+        d.getDate() + amount
+    );
+
+    return d;
+}
+
+
+function formatShortDate(key){
+
+    return parseDateKey(key)
+        .toLocaleDateString("ru-RU",{
+            day:"2-digit",
+            month:"2-digit"
+        });
+}
+
+
+function formatFullDate(key){
+
+    return parseDateKey(key)
+        .toLocaleDateString("ru-RU",{
+            day:"2-digit",
+            month:"long",
+            year:"numeric"
+        });
+}
+
+
+function escapeHtml(value){
+
+    return String(value ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+}
+
+
+function setText(id,value){
+
+    const el =
+        document.getElementById(id);
+
+    if(el){
+        el.textContent = value;
+    }
+}
+
+
+function getCommissionAmount(product){
+
+    const sale = parseNumber(product.sale);
+    const commissionPercent = parseNumber(product.commission);
+
+    return sale * commissionPercent / 100;
+}
+
+
+function getProfit(product){
+
+    return (
+        parseNumber(product.sale) -
+        parseNumber(product.purchase) -
+        getCommissionAmount(product) -
+        parseNumber(product.delivery)
+    );
+}
+
+
+function getSalesCount(product){
+
+    return Array.isArray(product.salesHistory)
+        ? product.salesHistory.length
+        : 0;
+}
+
+
+/* =========================
+   STORAGE
+========================= */
+
+function loadAccounts(){
+
+    try{
+
+        accounts =
+            JSON.parse(
+                localStorage.getItem(STORAGE_KEY) || "{}"
+            );
+
+    }catch{
+
+        accounts = {};
+
+    }
+
+
+    currentAccountId =
+        localStorage.getItem(CURRENT_KEY);
+
+
+    if(
+        currentAccountId &&
+        !accounts[currentAccountId]
+    ){
+        currentAccountId = null;
+    }
+}
+
+
+/* =========================
+   IPHONE MEDIA STORAGE
+   Фото товаров и аватар храним отдельно от localStorage.
+   Это важно для iPhone: большие base64-файлы больше не забивают
+   лимит localStorage и не ломают создание/сохранение товара.
+========================= */
+
+const MEDIA_DB_NAME = "DropFlowMediaDB";
+const MEDIA_STORE_NAME = "media";
+
+function openMediaDB(){
+    return new Promise((resolve,reject)=>{
+        if(!window.indexedDB){
+            reject(new Error("indexeddb-unavailable"));
+            return;
+        }
+
+        const request = indexedDB.open(MEDIA_DB_NAME, 1);
+
+        request.onupgradeneeded = ()=>{
+            const db = request.result;
+            if(!db.objectStoreNames.contains(MEDIA_STORE_NAME)){
+                db.createObjectStore(MEDIA_STORE_NAME);
+            }
+        };
+
+        request.onsuccess = ()=>resolve(request.result);
+        request.onerror = ()=>reject(request.error || new Error("indexeddb-open"));
+    });
+}
+
+async function saveMediaStore(){
+    const db = await openMediaDB();
+
+    await new Promise((resolve,reject)=>{
+        const tx = db.transaction(MEDIA_STORE_NAME,"readwrite");
+        const store = tx.objectStore(MEDIA_STORE_NAME);
+
+        /*
+           Полностью очищаем медиахранилище, но НИКОГДА не удаляем
+           постоянную отметку авторизации. Раньше store.clear() мог
+           удалить auth:v1, после чего Android/iPhone снова показывал
+           окно пароля при следующем открытии HTML.
+        */
+        store.clear();
+
+        const authorized = ownerAuthorizedFromDB === true || (()=>{
+            try { return localStorage.getItem(OWNER_AUTH_KEY) === "1"; }
+            catch(e){ return false; }
+        })();
+
+        if(authorized){
+            store.put("1", "auth:v1");
+        }
+
+        Object.values(accounts).forEach(account=>{
+            if(!account?.id) return;
+
+            if(account.avatar){
+                store.put(account.avatar, `avatar:${account.id}`);
+            }
+
+            if(Array.isArray(account.products)){
+                account.products.forEach(product=>{
+                    if(product?.id && product.photo){
+                        store.put(product.photo, `photo:${account.id}:${product.id}`);
+                    }
+                });
+            }
+        });
+
+        tx.oncomplete = resolve;
+        tx.onerror = ()=>reject(tx.error || new Error("indexeddb-save"));
+        tx.onabort = ()=>reject(tx.error || new Error("indexeddb-abort"));
+    });
+
+    db.close();
+}
+
+async function loadMediaStore(){
+    try{
+        const db = await openMediaDB();
+
+        await new Promise((resolve,reject)=>{
+            const tx = db.transaction(MEDIA_STORE_NAME,"readonly");
+            const store = tx.objectStore(MEDIA_STORE_NAME);
+            const request = store.openCursor();
+
+            request.onsuccess = ()=>{
+                const cursor = request.result;
+                if(!cursor){
+                    resolve();
+                    return;
+                }
+
+                const key = String(cursor.key || "");
+                const value = cursor.value;
+
+                if(key === "auth:v1") {
+                    if(value === "1") ownerAuthorizedFromDB = true;
+                }else if(key.startsWith("avatar:")){
+                    const accountId = key.slice(7);
+                    if(accounts[accountId] && typeof value === "string") accounts[accountId].avatar = value;
+                }else if(key.startsWith("photo:")){
+                    const parts = key.split(":");
+                    const accountId = parts[1];
+                    const productId = parts.slice(2).join(":");
+                    const account = accounts[accountId];
+                    const product = account?.products?.find(p=>p.id === productId);
+                    if(product && typeof value === "string") product.photo = value;
+                }
+
+                cursor.continue();
+            };
+
+            request.onerror = ()=>reject(request.error || new Error("indexeddb-read"));
+        });
+
+        db.close();
+        mediaStorageReady = true;
+    }catch(error){
+        mediaStorageReady = false;
+        console.error(error);
+    }
+}
+
+function compactAccountsForStorage(){
+    const compact = {};
+    const canUseMediaDB = mediaStorageReady;
+
+    Object.entries(accounts).forEach(([id,account])=>{
+        compact[id] = {
+            ...account,
+            avatar: canUseMediaDB ? "" : (account.avatar || ""),
+            products: Array.isArray(account?.products)
+                ? account.products.map(product=>({
+                    ...product,
+                    photo: canUseMediaDB ? "" : (product.photo || "")
+                }))
+                : []
+        };
+    });
+
+    return compact;
+}
+
+function saveAccounts(){
+    try{
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(compactAccountsForStorage())
+        );
+
+        /* Запись медиа запускаем сразу; сами данные уже сохранены. */
+        if(mediaStorageReady){
+            saveMediaStore().catch(error=>{
+                mediaStorageReady = false;
+                console.error(error);
+
+                /* Если IndexedDB недоступна, возвращаем медиа прямо
+                   в localStorage, чтобы данные не потерялись. */
+                try{
+                    localStorage.setItem(
+                        STORAGE_KEY,
+                        JSON.stringify(accounts)
+                    );
+                }catch(fallbackError){
+                    console.error(fallbackError);
+                    showToast("Не удалось сохранить фото. Проверь память iPhone.");
+                }
+            });
+        }
+
+        return true;
+    }catch(error){
+        console.error(error);
+        showToast("Не удалось сохранить данные. Проверь память iPhone.");
+        return false;
+    }
+}
+
+
+function saveCurrentId(){
+
+    if(currentAccountId){
+
+        localStorage.setItem(
+            CURRENT_KEY,
+            currentAccountId
+        );
+
+    }else{
+
+        localStorage.removeItem(
+            CURRENT_KEY
+        );
+
+    }
+}
+
+
+function getCurrentAccount(){
+
+    return currentAccountId
+        ? accounts[currentAccountId]
+        : null;
+}
+
+
+function loadCurrentAccount(){
+
+    const account =
+        getCurrentAccount();
+
+    products =
+        account?.products || [];
+
+
+    products.forEach(product=>{
+
+        if(!Array.isArray(product.salesHistory)){
+            product.salesHistory = [];
+        }
+
+        if(!product.createdDate){
+            product.createdDate =
+                localDateKey();
+        }
+
+    });
+
+}
+
+
+function saveProducts(){
+
+    const account =
+        getCurrentAccount();
+
+    if(!account) return false;
+
+    const previous = account.products;
+    account.products = products;
+
+    const saved = saveAccounts();
+
+    if(!saved){
+        account.products = previous;
+        products = previous || [];
+    }
+
+    return saved;
+}
+
+
+/* =========================
+   LOGIN
+========================= */
+
+function showLogin(){
+
+    document
+        .getElementById("loginScreen")
+        .classList.remove("hidden");
+
+    document
+        .getElementById("app")
+        .classList.add("hidden");
+}
+
+
+function hideLogin(){
+
+    document
+        .getElementById("loginScreen")
+        .classList.add("hidden");
+
+    document
+        .getElementById("app")
+        .classList.remove("hidden");
+}
+
+
+const OWNER_ACCESS_PASSWORD = "dropFlow-01-01";
+const OWNER_AUTH_KEY = "dropflow_owner_authorized_v1";
+const OWNER_AUTH_COOKIE = "dropflow_owner_authorized_v1";
+const AUTH_DB_NAME = "DropFlowAuthDB";
+const AUTH_STORE_NAME = "auth";
+const AUTH_CACHE_NAME = "DropFlowAuthCacheV2";
+const AUTH_CACHE_URL = "./__dropflow_authorized_v1__";
+
+/*
+   Авторизация хранится отдельно от медиахранилища.
+   Раньше отметка могла зависеть от localStorage/общей IndexedDB.
+   Теперь есть три независимых слоя: localStorage, cookie и отдельная
+   IndexedDB. Это особенно важно для HTTPS/PWA на iPhone.
+*/
+
+function openAuthDB(){
+    return new Promise((resolve,reject)=>{
+        if(!window.indexedDB){
+            reject(new Error("indexeddb-unavailable"));
+            return;
+        }
+        const request = indexedDB.open(AUTH_DB_NAME, 1);
+        request.onupgradeneeded = ()=>{
+            const db = request.result;
+            if(!db.objectStoreNames.contains(AUTH_STORE_NAME)){
+                db.createObjectStore(AUTH_STORE_NAME);
+            }
+        };
+        request.onsuccess = ()=>resolve(request.result);
+        request.onerror = ()=>reject(request.error || new Error("auth-db-open"));
+    });
+}
+
+function readAuthCookie(){
+    try{
+        return document.cookie.split(";").some(part=>part.trim() === OWNER_AUTH_COOKIE + "=1");
+    }catch(e){ return false; }
+}
+
+function writeAuthCookie(value){
+    try{
+        if(value){
+            document.cookie = OWNER_AUTH_COOKIE + "=1; Max-Age=31536000; Path=/; SameSite=Lax; Secure";
+        }else{
+            document.cookie = OWNER_AUTH_COOKIE + "=; Max-Age=0; Path=/; SameSite=Lax; Secure";
+        }
+    }catch(e){}
+}
+
+async function readAuthCache(){
+    try{
+        if(!window.caches) return false;
+        const cache = await caches.open(AUTH_CACHE_NAME);
+        const response = await cache.match(AUTH_CACHE_URL);
+        if(!response) return false;
+        return (await response.text()) === "1";
+    }catch(e){ return false; }
+}
+
+async function writeAuthCache(value){
+    try{
+        if(!window.caches) return;
+        const cache = await caches.open(AUTH_CACHE_NAME);
+        if(value){
+            await cache.put(AUTH_CACHE_URL, new Response("1", {headers:{"Content-Type":"text/plain"}}));
+        }else{
+            await cache.delete(AUTH_CACHE_URL);
+        }
+    }catch(e){}
+}
+
+async function requestPersistentStorage(){
+    try{
+        if(navigator.storage && navigator.storage.persist){
+            await navigator.storage.persist();
+        }
+    }catch(e){}
+}
+
+function hasPermanentAccessLink(){
+    try{
+        return window.location.hash === "#df-access-1";
+    }catch(e){ return false; }
+}
+
+async function loadPersistentOwnerAuthorization(){
+    let authorized = false;
+
+    /*
+       РЕЗЕРВНЫЙ ВАРИАНТ ДЛЯ TELEGRAM/iOS:
+       если пользователь однажды вошёл и текущая ссылка уже содержит
+       специальный маркер доступа, вход больше не зависит от localStorage,
+       IndexedDB или cookies. Это нужно именно для окружений, где Telegram
+       может очищать/разделять локальное хранилище HTML/PWA.
+    */
+    if(hasPermanentAccessLink()){
+        authorized = true;
+    }
+
+    try{
+        if(!authorized) authorized = localStorage.getItem(OWNER_AUTH_KEY) === "1";
+    }catch(e){}
+
+    if(!authorized){
+        authorized = readAuthCookie();
+    }
+
+    if(!authorized){
+        authorized = await readAuthCache();
+    }
+
+    if(!authorized && window.indexedDB){
+        try{
+            const db = await openAuthDB();
+            authorized = await new Promise((resolve,reject)=>{
+                const tx = db.transaction(AUTH_STORE_NAME,"readonly");
+                const request = tx.objectStore(AUTH_STORE_NAME).get("owner");
+                request.onsuccess = ()=>resolve(request.result === "1");
+                request.onerror = ()=>reject(request.error || new Error("auth-db-read"));
+            });
+            db.close();
+        }catch(e){}
+    }
+
+    ownerAuthorizedFromDB = authorized;
+
+    /* Восстанавливаем отметку во все доступные хранилища. */
+    if(authorized){
+        try{ localStorage.setItem(OWNER_AUTH_KEY,"1"); }catch(e){}
+        writeAuthCookie(true);
+        await writeAuthCache(true);
+    }
+
+    return authorized;
+}
+
+function isOwnerAuthorized(){
+    if(ownerAuthorizedFromDB === true) return true;
+    try { if(localStorage.getItem(OWNER_AUTH_KEY) === "1") return true; } catch(e) {}
+    return readAuthCookie();
+}
+
+async function setOwnerAuthorized(value){
+    ownerAuthorizedFromDB = !!value;
+
+    try{
+        if(value) localStorage.setItem(OWNER_AUTH_KEY,"1");
+        else localStorage.removeItem(OWNER_AUTH_KEY);
+    }catch(e){}
+
+    writeAuthCookie(!!value);
+    await writeAuthCache(!!value);
+    if(value) await requestPersistentStorage();
+
+    if(window.indexedDB){
+        openAuthDB().then(db=>new Promise((resolve,reject)=>{
+            const tx=db.transaction(AUTH_STORE_NAME,"readwrite");
+            const store=tx.objectStore(AUTH_STORE_NAME);
+            if(value) store.put("1","owner");
+            else store.delete("owner");
+            tx.oncomplete=resolve;
+            tx.onerror=()=>reject(tx.error||new Error("auth-db-write"));
+            tx.onabort=()=>reject(tx.error||new Error("auth-db-abort"));
+        }).finally(()=>db.close())).catch(()=>{});
+    }
+
+    /* Сохраняем также старый маркер media DB для совместимости с V1. */
+    if(window.indexedDB){
+        openMediaDB().then(db=>new Promise((resolve,reject)=>{
+            const tx=db.transaction(MEDIA_STORE_NAME,"readwrite");
+            const store=tx.objectStore(MEDIA_STORE_NAME);
+            if(value) store.put("1","auth:v1");
+            else store.delete("auth:v1");
+            tx.oncomplete=resolve;
+            tx.onerror=()=>reject(tx.error||new Error("media-auth-write"));
+            tx.onabort=()=>reject(tx.error||new Error("media-auth-abort"));
+        }).finally(()=>db.close())).catch(()=>{});
+    }
+}
+
+async function handleOwnerLogin(e){
+    if(e && e.preventDefault) e.preventDefault();
+
+    const input = document.getElementById("loginPassword");
+    const password = input ? input.value : "";
+
+    if(password !== OWNER_ACCESS_PASSWORD){
+        showToast("Неверный пароль");
+        return false;
+    }
+
+    const account = ensureOwnerAccount();
+    currentAccountId = account.id;
+    saveCurrentId();
+    loadCurrentAccount();
+    await setOwnerAuthorized(true);
+
+    /* После первого правильного пароля закрепляем доступ прямо в URL.
+       Маркер не содержит пароль и позволяет повторно открыть приложение
+       даже если Telegram/iOS не сохранил localStorage. */
+    try{
+        if(window.history && window.location.hash !== "#df-access-1"){
+            window.history.replaceState(null, "", window.location.pathname + window.location.search + "#df-access-1");
+        }
+    }catch(e){}
+
+    if(input) input.value = "";
+    hideLogin();
+    updateAll();
+    showPage("home");
+    showToast("Вход выполнен");
+    return false;
+}
+
+function ensureOwnerAccount(){
+
+    const existing = Object.values(accounts)[0];
+
+    if(existing){
+        currentAccountId = existing.id;
+        if(!Array.isArray(existing.products)){
+            existing.products = [];
+        }
+        if(!existing.name){
+            existing.name = "DropFlow";
+        }
+        return existing;
+    }
+
+    const id = "account_owner";
+
+    accounts[id] = {
+        id,
+        name: "DropFlow",
+        password: "",
+        createdAt: localDateKey(),
+        avatar: "",
+        products: []
+    };
+
+    currentAccountId = id;
+    saveAccounts();
+    return accounts[id];
+}
+
+document
+    .getElementById("loginForm")
+    .addEventListener("submit", handleOwnerLogin);
+
+document
+    .getElementById("loginButton")
+    .addEventListener("click", handleOwnerLogin);
+
+/* =========================
+   NAVIGATION
+========================= */
+
+function showPage(page){
+
+    document
+        .querySelectorAll(".page")
+        .forEach(el =>
+            el.classList.remove("active")
+        );
+
+
+    const target =
+        document.getElementById(
+            page + "Page"
+        );
+
+
+    if(target){
+        target.classList.add("active");
+    }
+
+
+    document
+        .querySelectorAll(".nav-button")
+        .forEach(button =>
+            button.classList.toggle(
+                "active",
+                button.dataset.page === page
+            )
+        );
+
+
+    const titles = {
+
+        home:[
+            "Главное",
+            "Обзор магазина"
+        ],
+
+        assortment:[
+            "Ассортимент",
+            "Твои товары"
+        ],
+
+        statistics:[
+            "Статистика",
+            "Продажи и прибыль"
+        ],
+
+        account:[
+            "Аккаунт",
+            "Профиль и настройки"
+        ]
+
+    };
+
+
+    setText(
+        "topTitle",
+        titles[page][0]
+    );
+
+    setText(
+        "topSubtitle",
+        titles[page][1]
+    );
+
+
+    if(page === "home"){
+        updateDashboard();
+    }
+
+    if(page === "assortment"){
+        renderProducts();
+    }
+
+    if(page === "statistics"){
+        renderStatistics();
+    }
+
+    if(page === "account"){
+        renderAccount();
+    }
+
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+}
+
+
+/* =========================
+   DASHBOARD
+========================= */
+
+function updateDashboard(){
+
+    let sales = 0;
+    let revenue = 0;
+    let expenses = 0;
+    let profit = 0;
+
+
+    products.forEach(product=>{
+
+        const count =
+            getSalesCount(product);
+
+        sales += count;
+
+        const salePrice = parseNumber(product.sale);
+        const purchase = parseNumber(product.purchase);
+        const commission = getCommissionAmount(product);
+        const delivery = parseNumber(product.delivery);
+
+        revenue += salePrice * count;
+        expenses += purchase * count;
+        profit += (salePrice - purchase - commission - delivery) * count;
+
+    });
+
+
+    setText(
+        "dashboardProfit",
+        money(profit)
+    );
+
+    setText(
+        "dashboardSales",
+        sales
+    );
+
+    setText(
+        "dashboardRevenue",
+        money(revenue)
+    );
+
+    setText(
+        "dashboardExpenses",
+        money(expenses)
+    );
+
+    setText(
+        "dashboardProducts",
+        products.length
+    );
+
+
+    const today =
+        localDateKey();
+
+
+    let todaySales = 0;
+    let todayRevenue = 0;
+    let todayExpenses = 0;
+    let todayProfit = 0;
+
+
+    products.forEach(product=>{
+
+        const count =
+            (product.salesHistory || [])
+                .filter(s =>
+                    s.date === today
+                ).length;
+
+
+        todaySales += count;
+
+        const salePrice = parseNumber(product.sale);
+        const purchase = parseNumber(product.purchase);
+        const commission = getCommissionAmount(product);
+        const delivery = parseNumber(product.delivery);
+
+        todayRevenue += salePrice * count;
+        todayExpenses += purchase * count;
+        todayProfit += (salePrice - purchase - commission - delivery) * count;
+
+    });
+
+
+    setText(
+        "todaySales",
+        todaySales
+    );
+
+    setText(
+        "todayRevenue",
+        money(todayRevenue)
+    );
+
+    setText(
+        "todayExpenses",
+        money(todayExpenses)
+    );
+
+    setText(
+        "todayProfit",
+        money(todayProfit)
+    );
+
+
+    const account =
+        getCurrentAccount();
+
+
+    setText(
+        "welcomeName",
+        account
+            ? `Привет, ${account.name}`
+            : "Привет"
+    );
+
+
+    renderRecent();
+}
+
+
+function renderRecent(){
+
+    const container =
+        document.getElementById(
+            "recentActivity"
+        );
+
+
+    const sales = [];
+
+
+    products.forEach(product=>{
+
+        (product.salesHistory || [])
+            .forEach(sale=>{
+
+                sales.push({
+                    product,
+                    date:sale.date
+                });
+
+            });
+
+    });
+
+
+    sales.sort((a,b) =>
+        b.date.localeCompare(a.date)
+    );
+
+
+    const latest =
+        sales.slice(0,7);
+
+
+    if(!latest.length){
+
+        container.innerHTML = `
+            <div class="empty glass">
+                <div class="empty-title">
+                    Продаж пока нет
+                </div>
+                Здесь появится история продаж.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    container.innerHTML =
+        latest.map(item=>`
+
+            <div class="recent-item glass">
+
+                <div class="recent-info">
+
+                    <div class="recent-name">
+                        ${escapeHtml(item.product.name)}
+                    </div>
+
+                    <div class="recent-date">
+                        ${formatFullDate(item.date)}
+                    </div>
+
+                </div>
+
+                <div class="recent-profit">
+                    +${money(getProfit(item.product))}
+                </div>
+
+            </div>
+
+        `).join("");
+}
+
+
+/* =========================
+   PRODUCTS
+========================= */
+
+function changeProductFilter(filter,button){
+
+    productFilter = filter;
+
+
+    document
+        .querySelectorAll(".filter")
+        .forEach(el =>
+            el.classList.remove("active")
+        );
+
+
+    button.classList.add("active");
+
+    renderProducts();
+}
+
+
+function renderProducts(){
+
+    const container =
+        document.getElementById(
+            "productsGrid"
+        );
+
+
+    let list =
+        [...products];
+
+
+    const query =
+        document
+            .getElementById("searchInput")
+            ?.value
+            .trim()
+            .toLowerCase() || "";
+
+
+    if(query){
+
+        list =
+            list.filter(product =>
+                product.name
+                    .toLowerCase()
+                    .includes(query)
+            );
+
+    }
+
+
+    if(productFilter === "sold"){
+
+        list =
+            list.filter(product =>
+                getSalesCount(product) > 0
+            );
+
+    }
+
+
+    if(productFilter === "unsold"){
+
+        list =
+            list.filter(product =>
+                getSalesCount(product) === 0
+            );
+
+    }
+
+
+    if(productFilter === "profit"){
+
+        list.sort((a,b)=>
+            getProfit(b) -
+            getProfit(a)
+        );
+
+    }
+
+
+    if(productFilter === "new"){
+
+        list.sort((a,b)=>
+            b.createdDate.localeCompare(
+                a.createdDate
+            )
+        );
+
+    }
+
+
+    if(!list.length){
+
+        container.innerHTML = `
+            <div
+                class="empty glass"
+                style="grid-column:1/-1"
+            >
+                <div class="empty-title">
+                    Товаров нет
+                </div>
+
+                Добавь товар в ассортимент.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    container.innerHTML =
+        list.map(product=>{
+
+            const count =
+                getSalesCount(product);
+
+
+            return `
+
+                <article class="product glass">
+
+                    <div class="product-image">
+
+                        ${
+                            product.photo
+                                ? `
+                                    <img
+                                        src="${product.photo}"
+                                        alt=""
+                                    >
+                                  `
+                                : `
+                                    <div class="no-image">
+                                        Фото не выбрано
+                                    </div>
+                                  `
+                        }
+
+                    </div>
+
+
+                    <div class="product-content">
+
+                        <div class="product-name">
+                            ${escapeHtml(product.name)}
+                        </div>
+
+                        <div class="product-date">
+                            ${formatFullDate(product.createdDate)}
+                        </div>
+
+                        ${
+                            product.description
+                                ? `
+                                    <div class="product-description">
+                                        ${escapeHtml(product.description)}
+                                    </div>
+                                  `
+                                : ""
+                        }
+
+                        <div class="product-info">
+
+                            <div class="info-cell">
+                                <div class="info-label">
+                                    Закуп
+                                </div>
+
+                                <div class="info-value">
+                                    ${money(product.purchase)}
+                                </div>
+                            </div>
+
+
+                            <div class="info-cell">
+                                <div class="info-label">
+                                    Продажа
+                                </div>
+
+                                <div class="info-value">
+                                    ${money(product.sale)}
+                                </div>
+                            </div>
+
+
+                            <div class="info-cell">
+                                <div class="info-label">
+                                    Прибыль
+                                </div>
+
+                                <div class="info-value green">
+                                    ${money(getProfit(product))}
+                                </div>
+                            </div>
+
+
+                            <div class="info-cell">
+                                <div class="info-label">
+                                    Продано
+                                </div>
+
+                                <div class="info-value">
+                                    ${count}
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="product-actions">
+
+                            <button
+                                class="action sell"
+                                onclick="sellProduct('${product.id}')"
+                            >
+                                Продать
+                            </button>
+
+                            <button
+                                class="action"
+                                onclick="openHistory('${product.id}')"
+                            >
+                                История
+                            </button>
+
+                            <button
+                                class="action"
+                                onclick="editProduct('${product.id}')"
+                            >
+                                Изменить
+                            </button>
+
+                        </div>
+
+
+                        <div class="product-actions second">
+
+                            <button
+                                class="action delete"
+                                onclick="deleteProduct('${product.id}')"
+                            >
+                                Удалить товар
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            `;
+
+        }).join("");
+}
+
+
+/* =========================
+   PRODUCT MODAL
+========================= */
+
+function openAddModal(){
+
+    document
+        .getElementById("productForm")
+        .reset();
+
+
+    document
+        .getElementById("productId")
+        .value = "";
+
+
+    setText(
+        "productModalTitle",
+        "Новый товар"
+    );
+
+
+    document
+        .getElementById("createdDate")
+        .value =
+        localDateKey();
+
+
+    tempPhoto = "";
+
+
+    document
+        .getElementById("photoPreview")
+        .textContent =
+        "Фото не выбрано";
+
+
+    updateProfitPreview();
+
+
+    document
+        .getElementById("productOverlay")
+        .classList.add("show");
+}
+
+
+function closeProductModal(){
+
+    document
+        .getElementById("productOverlay")
+        .classList.remove("show");
+}
+
+
+function editProduct(id){
+
+    const product =
+        products.find(
+            p => p.id === id
+        );
+
+
+    if(!product) return;
+
+
+    setText(
+        "productModalTitle",
+        "Изменение товара"
+    );
+
+
+    document.getElementById("productId").value =
+        product.id;
+
+    document.getElementById("productName").value =
+        product.name || "";
+
+    document.getElementById("purchase").value =
+        product.purchase || "";
+
+    document.getElementById("sale").value =
+        product.sale || "";
+
+    document.getElementById("commission").value =
+        product.commission || "";
+
+    document.getElementById("delivery").value =
+        product.delivery || "";
+
+    document.getElementById("createdDate").value =
+        product.createdDate || localDateKey();
+
+    document.getElementById("description").value =
+        product.description || "";
+
+
+    tempPhoto =
+        product.photo || "";
+
+
+    document.getElementById(
+        "photoPreview"
+    ).innerHTML =
+        product.photo
+            ? `<img src="${product.photo}">`
+            : "Фото не выбрано";
+
+
+    updateProfitPreview();
+
+
+    document
+        .getElementById("productOverlay")
+        .classList.add("show");
+}
+
+
+document
+    .getElementById("productForm")
+    .addEventListener("submit",function(e){
+
+        e.preventDefault();
+
+
+        const id =
+            document
+                .getElementById("productId")
+                .value;
+
+
+        const data = {
+
+            name:
+                document
+                    .getElementById("productName")
+                    .value
+                    .trim(),
+
+            purchase:
+                parseNumber(
+                    document.getElementById("purchase").value
+                ),
+
+            sale:
+                parseNumber(
+                    document.getElementById("sale").value
+                ),
+
+            commission:
+                parseNumber(
+                    document.getElementById("commission").value
+                ),
+
+            delivery:
+                parseNumber(
+                    document.getElementById("delivery").value
+                ),
+
+            createdDate:
+                document.getElementById("createdDate").value,
+
+            description:
+                document.getElementById("description").value,
+
+            photo:
+                tempPhoto
+
+        };
+
+
+        if(!data.name){
+
+            showToast(
+                "Введи название товара"
+            );
+
+            return;
+        }
+
+
+        if(id){
+
+            const product =
+                products.find(
+                    p => p.id === id
+                );
+
+
+            if(product){
+                Object.assign(
+                    product,
+                    data
+                );
+            }
+
+        }else{
+
+            products.unshift({
+
+                id:
+                    "product_" +
+                    Date.now() +
+                    "_" +
+                    Math.random().toString(36).slice(2,8),
+
+                ...data,
+
+                salesHistory:[]
+
+            });
+
+        }
+
+
+        const saved = saveProducts();
+
+        if(!saved){
+            return;
+        }
+
+        closeProductModal();
+
+        updateAll();
+
+        showPage("assortment");
+
+        showToast(
+            id
+                ? "Товар изменён"
+                : "Товар добавлен"
+        );
+
+    });
+
+
+function previewPhoto(event){
+
+    const file =
+        event.target.files?.[0];
+
+
+    if(!file) return;
+
+
+    if(!file.type.startsWith("image/")){
+
+        showToast(
+            "Выбери изображение"
+        );
+
+        return;
+    }
+
+
+    /*
+       Фото раньше сохранялось в localStorage
+       в исходном размере. Если товаров становилось
+       много и у каждого было большое фото,
+       localStorage мог переполниться и создание
+       нового товара прекращалось.
+
+       Теперь перед сохранением фото автоматически
+       уменьшается. Интерфейс при этом не меняется.
+    */
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload = ()=>{
+
+        const image =
+            new Image();
+
+
+        image.onload = ()=>{
+
+            const maxSide = 1200;
+
+            let width = image.naturalWidth;
+            let height = image.naturalHeight;
+
+
+            if(width > maxSide || height > maxSide){
+
+                const ratio =
+                    Math.min(
+                        maxSide / width,
+                        maxSide / height
+                    );
+
+                width = Math.round(width * ratio);
+                height = Math.round(height * ratio);
+
+            }
+
+
+            const canvas =
+                document.createElement("canvas");
+
+            canvas.width = width;
+            canvas.height = height;
+
+
+            const ctx =
+                canvas.getContext("2d");
+
+            ctx.drawImage(
+                image,
+                0,
+                0,
+                width,
+                height
+            );
+
+
+            tempPhoto =
+                canvas.toDataURL(
+                    "image/jpeg",
+                    0.78
+                );
+
+
+            document
+                .getElementById("photoPreview")
+                .innerHTML =
+                `<img src="${tempPhoto}">`;
+
+        };
+
+
+        image.onerror = ()=>{
+
+            showToast(
+                "Не удалось обработать фото"
+            );
+
+        };
+
+
+        image.src = reader.result;
+
+    };
+
+
+    reader.onerror = ()=>{
+
+        showToast(
+            "Не удалось загрузить фото"
+        );
+
+    };
+
+
+    reader.readAsDataURL(file);
+}
+
+
+function updateProfitPreview(){
+
+    const purchase =
+        parseNumber(
+            document.getElementById("purchase").value
+        );
+
+    const sale =
+        parseNumber(
+            document.getElementById("sale").value
+        );
+
+    const commissionPercent =
+        parseNumber(
+            document.getElementById("commission").value
+        );
+
+    const commission =
+        sale * commissionPercent / 100;
+
+    const delivery =
+        parseNumber(
+            document.getElementById("delivery").value
+        );
+
+
+    setText(
+        "profitPreview",
+        money(
+            sale -
+            purchase -
+            commission -
+            delivery
+        )
+    );
+}
+
+
+[
+    "purchase",
+    "sale",
+    "commission",
+    "delivery"
+].forEach(id=>{
+
+    document
+        .getElementById(id)
+        .addEventListener(
+            "input",
+            updateProfitPreview
+        );
+
+});
+
+
+/* =========================
+   SALES
+========================= */
+
+function sellProduct(id){
+
+    const product =
+        products.find(
+            p => p.id === id
+        );
+
+
+    if(!product) return;
+
+
+    if(!Array.isArray(product.salesHistory)){
+        product.salesHistory = [];
+    }
+
+
+    product.salesHistory.push({
+
+        id:
+            "sale_" +
+            Date.now() +
+            "_" +
+            Math.random().toString(36).slice(2,8),
+
+        date:
+            localDateKey()
+
+    });
+
+
+    saveProducts();
+
+    updateAll();
+
+    renderProducts();
+
+    showToast(
+        "Продажа записана"
+    );
+}
+
+
+function deleteProduct(id){
+
+    const product =
+        products.find(
+            p => p.id === id
+        );
+
+
+    if(!product) return;
+
+
+    if(
+        !confirm(
+            `Удалить товар «${product.name}»?`
+        )
+    ){
+        return;
+    }
+
+
+    products =
+        products.filter(
+            p => p.id !== id
+        );
+
+
+    saveProducts();
+
+    updateAll();
+
+    renderProducts();
+
+    showToast(
+        "Товар удалён"
+    );
+}
+
+
+/* =========================
+   HISTORY
+========================= */
+
+function openHistory(id){
+
+    const product =
+        products.find(
+            p => p.id === id
+        );
+
+
+    if(!product) return;
+
+
+    historyProductId = id;
+
+
+    setText(
+        "historyProductName",
+        product.name
+    );
+
+
+    const list =
+        document.getElementById(
+            "historyList"
+        );
+
+
+    if(!product.salesHistory.length){
+
+        list.innerHTML = `
+            <div class="empty">
+                Продаж пока нет.
+            </div>
+        `;
+
+    }else{
+
+        list.innerHTML =
+            [...product.salesHistory]
+                .reverse()
+                .map((sale,index)=>`
+
+                    <div class="history-item">
+
+                        <div>
+
+                            <div class="history-number">
+                                Продажа №${product.salesHistory.length-index}
+                            </div>
+
+                            <div class="history-date">
+                                ${formatFullDate(sale.date)}
+                            </div>
+
+                        </div>
+
+                        <div class="history-profit">
+                            +${money(getProfit(product))}
+                        </div>
+
+                    </div>
+
+                `).join("");
+
+    }
+
+
+    document
+        .getElementById("historyOverlay")
+        .classList.add("show");
+}
+
+
+function closeHistory(){
+
+    document
+        .getElementById("historyOverlay")
+        .classList.remove("show");
+
+    historyProductId = null;
+}
+
+
+function undoLastSale(){
+
+    if(!historyProductId) return;
+
+
+    const product =
+        products.find(
+            p => p.id === historyProductId
+        );
+
+
+    if(
+        !product ||
+        !product.salesHistory.length
+    ){
+
+        showToast(
+            "Продаж нет"
+        );
+
+        return;
+    }
+
+
+    product.salesHistory.pop();
+
+    saveProducts();
+
+    closeHistory();
+
+    updateAll();
+
+    renderProducts();
+
+    showToast(
+        "Последняя продажа отменена"
+    );
+}
+
+
+/* =========================
+   STATISTICS
+========================= */
+
+function changePeriod(days,button){
+
+    currentPeriod = days;
+
+
+    document
+        .querySelectorAll(
+            ".stats-controls:first-of-type .control"
+        )
+        .forEach(el =>
+            el.classList.remove("active")
+        );
+
+
+    button.classList.add("active");
+
+    renderStatistics();
+}
+
+
+function changeMetric(metric,button){
+
+    currentMetric = metric;
+
+
+    const controls =
+        document.querySelectorAll(
+            ".stats-controls"
+        );
+
+
+    if(controls[1]){
+
+        controls[1]
+            .querySelectorAll(".control")
+            .forEach(el =>
+                el.classList.remove("active")
+            );
+
+    }
+
+
+    button.classList.add("active");
+
+    renderStatistics();
+}
+
+
+function getDailyData(days){
+
+    const today =
+        parseDateKey(
+            localDateKey()
+        );
+
+
+    const result = [];
+
+
+    for(
+        let i=days-1;
+        i>=0;
+        i--
+    ){
+
+        const date =
+            localDateKey(
+                addDays(today,-i)
+            );
+
+
+        let sales = 0;
+        let revenue = 0;
+        let expenses = 0;
+        let profit = 0;
+
+
+        products.forEach(product=>{
+
+            const count =
+                (product.salesHistory || [])
+                    .filter(
+                        sale =>
+                            sale.date === date
+                    ).length;
+
+
+            sales += count;
+
+            const salePrice = parseNumber(product.sale);
+            const purchase = parseNumber(product.purchase);
+            const commission = getCommissionAmount(product);
+            const delivery = parseNumber(product.delivery);
+
+            revenue += salePrice * count;
+            expenses += purchase * count;
+            profit += (salePrice - purchase - commission - delivery) * count;
+
+        });
+
+
+        result.push({
+            date,
+            sales,
+            revenue,
+            expenses,
+            profit
+        });
+
+    }
+
+
+    return result;
+}
+
+
+function renderStatistics(){
+
+    const data =
+        getDailyData(currentPeriod);
+
+
+    const values =
+        data.map(
+            item =>
+                item[currentMetric]
+        );
+
+
+    const total =
+        values.reduce(
+            (sum,value)=>
+                sum + value,
+            0
+        );
+
+
+    setText(
+        "chartTotal",
+        currentMetric === "sales"
+            ? total
+            : money(total)
+    );
+
+
+    setText(
+        "chartCaption",
+        currentMetric === "sales"
+            ? "Продаж за период"
+            : currentMetric === "revenue"
+                ? "Выручка за период"
+                : currentMetric === "expenses"
+                    ? "Расходы за период"
+                    : "Прибыль за период"
+    );
+
+
+    setText(
+        "chartPeriodLabel",
+        currentPeriod === 7
+            ? "7 дней"
+            : currentPeriod === 30
+                ? "30 дней"
+                : currentPeriod === 180
+                    ? "6 месяцев"
+                    : "1 год"
+    );
+
+
+    renderChart(data);
+
+    renderStatisticsSummary(data);
+
+    renderBestProducts();
+}
+
+
+function renderChart(data){
+
+    const chart =
+        document.getElementById("chart");
+
+
+    const values =
+        data.map(
+            item =>
+                item[currentMetric]
+        );
+
+
+    const max =
+        Math.max(
+            ...values,
+            1
+        );
+
+
+    chart.innerHTML =
+        data.map(item=>{
+
+            const value =
+                item[currentMetric];
+
+
+            const height =
+                value > 0
+                    ? Math.max(
+                        4,
+                        value / max * 220
+                    )
+                    : 2;
+
+
+            const label =
+                currentMetric === "sales"
+                    ? value
+                    : money(value);
+
+
+            return `
+
+                <div
+                    class="bar-wrap"
+                    title="${formatFullDate(item.date)} — ${label}"
+                >
+
+                    <div class="bar-number">
+                        ${value > 0 ? label : ""}
+                    </div>
+
+                    <div
+                        class="bar"
+                        style="height:${height}px"
+                    ></div>
+
+                    <div class="bar-date">
+                        ${formatShortDate(item.date)}
+                    </div>
+
+                </div>
+
+            `;
+
+        }).join("");
+}
+
+
+function renderStatisticsSummary(data){
+
+    const values =
+        data.map(
+            item =>
+                item[currentMetric]
+        );
+
+
+    const total =
+        values.reduce(
+            (sum,v)=>
+                sum + v,
+            0
+        );
+
+
+    const average =
+        total / data.length;
+
+
+    const best =
+        data.reduce(
+            (a,b)=>
+                b[currentMetric] >
+                a[currentMetric]
+                    ? b
+                    : a,
+            data[0]
+        );
+
+
+    const sales =
+        data.reduce(
+            (sum,item)=>
+                sum + item.sales,
+            0
+        );
+
+
+    const revenue =
+        data.reduce(
+            (sum,item)=>
+                sum + item.revenue,
+            0
+        );
+
+
+    setText(
+        "averageStat",
+        currentMetric === "sales"
+            ? average.toFixed(1)
+            : money(average)
+    );
+
+
+    setText(
+        "bestDayStat",
+        best && best[currentMetric] > 0
+            ? formatShortDate(best.date)
+            : "—"
+    );
+
+
+    setText(
+        "averageCheckStat",
+        sales > 0
+            ? money(revenue / sales)
+            : "0 ₽"
+    );
+
+
+    setText(
+        "periodSalesStat",
+        sales
+    );
+}
+
+
+function renderBestProducts(){
+
+    const container =
+        document.getElementById(
+            "bestProducts"
+        );
+
+
+    const ranked =
+        [...products]
+            .filter(
+                p => getSalesCount(p) > 0
+            )
+            .sort(
+                (a,b)=>
+                    getProfit(b) *
+                    getSalesCount(b) -
+                    getProfit(a) *
+                    getSalesCount(a)
+            )
+            .slice(0,5);
+
+
+    if(!ranked.length){
+
+        container.innerHTML = `
+            <div class="empty glass">
+                Пока нет данных.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    container.innerHTML =
+        ranked.map(product=>`
+
+            <div class="recent-item glass">
+
+                <div class="recent-info">
+
+                    <div class="recent-name">
+                        ${escapeHtml(product.name)}
+                    </div>
+
+                    <div class="recent-date">
+                        Продаж: ${getSalesCount(product)}
+                    </div>
+
+                </div>
+
+                <div class="recent-profit">
+                    +${money(
+                        getProfit(product) *
+                        getSalesCount(product)
+                    )}
+                </div>
+
+            </div>
+
+        `).join("");
+}
+
+
+/* =========================
+   ACCOUNT
+========================= */
+
+function renderAccount(){
+
+    const account =
+        getCurrentAccount();
+
+
+    if(!account) return;
+
+
+    setText(
+        "profileName",
+        account.name
+    );
+
+
+    setText(
+        "profileDate",
+        "Создан " +
+        formatFullDate(
+            account.createdAt
+        )
+    );
+
+
+    const sales =
+        products.reduce(
+            (sum,p)=>
+                sum + getSalesCount(p),
+            0
+        );
+
+
+    const profit =
+        products.reduce(
+            (sum,p)=>
+                sum +
+                getProfit(p) *
+                getSalesCount(p),
+            0
+        );
+
+
+    setText(
+        "profileProducts",
+        products.length
+    );
+
+    setText(
+        "profileSales",
+        sales
+    );
+
+    setText(
+        "profileProfit",
+        money(profit)
+    );
+
+
+    const letter =
+        account.name
+            .charAt(0)
+            .toUpperCase();
+
+
+    setText(
+        "topAvatarText",
+        letter
+    );
+
+
+    setText(
+        "profileAvatarText",
+        letter
+    );
+
+
+    if(account.avatar){
+
+        document
+            .getElementById("topAvatarText")
+            .classList.add("hidden");
+
+        document
+            .getElementById("topAvatarImg")
+            .classList.remove("hidden");
+
+        document
+            .getElementById("topAvatarImg")
+            .src =
+            account.avatar;
+
+
+        document
+            .getElementById("profileAvatarText")
+            .classList.add("hidden");
+
+        document
+            .getElementById("profileAvatarImg")
+            .classList.remove("hidden");
+
+        document
+            .getElementById("profileAvatarImg")
+            .src =
+            account.avatar;
+
+    }else{
+
+        document
+            .getElementById("topAvatarText")
+            .classList.remove("hidden");
+
+        document
+            .getElementById("topAvatarImg")
+            .classList.add("hidden");
+
+
+        document
+            .getElementById("profileAvatarText")
+            .classList.remove("hidden");
+
+        document
+            .getElementById("profileAvatarImg")
+            .classList.add("hidden");
+
+    }
+
+}
+
+
+/* =========================
+   PROFILE
+========================= */
+
+function editProfile(){
+
+    const account =
+        getCurrentAccount();
+
+
+    if(!account) return;
+
+
+    document.getElementById(
+        "editName"
+    ).value =
+        account.name;
+
+
+    tempAvatar =
+        account.avatar || "";
+
+
+    document.getElementById(
+        "avatarPreview"
+    ).innerHTML =
+        account.avatar
+            ? `<img src="${account.avatar}">`
+            : "Аватар не выбран";
+
+
+    document
+        .getElementById("profileOverlay")
+        .classList.add("show");
+}
+
+
+function closeProfileModal(){
+
+    document
+        .getElementById("profileOverlay")
+        .classList.remove("show");
+}
+
+
+function previewAvatar(event){
+
+    const file =
+        event.target.files?.[0];
+
+
+    if(!file) return;
+
+
+    if(file.size > 3 * 1024 * 1024){
+
+        showToast(
+            "Файл слишком большой"
+        );
+
+        return;
+    }
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload = ()=>{
+
+        tempAvatar =
+            reader.result;
+
+
+        document
+            .getElementById("avatarPreview")
+            .innerHTML =
+            `<img src="${tempAvatar}">`;
+
+    };
+
+
+    reader.readAsDataURL(file);
+}
+
+
+function saveProfile(){
+
+    const account =
+        getCurrentAccount();
+
+
+    if(!account) return;
+
+
+    const name =
+        document
+            .getElementById("editName")
+            .value
+            .trim();
+
+
+    if(!name){
+
+        showToast(
+            "Имя не может быть пустым"
+        );
+
+        return;
+    }
+
+
+    account.name = name;
+    account.avatar = tempAvatar;
+
+
+    saveAccounts();
+
+    closeProfileModal();
+
+    updateAll();
+
+    showToast(
+        "Профиль сохранён"
+    );
+}
+
+
+/* =========================
+   ACCOUNTS
+========================= */
+
+function showAccountsModal(){
+
+    renderAccounts();
+
+    document
+        .getElementById("accountsOverlay")
+        .classList.add("show");
+}
+
+
+function closeAccountsModal(){
+
+    document
+        .getElementById("accountsOverlay")
+        .classList.remove("show");
+}
+
+
+function renderAccounts(){
+
+    const container =
+        document.getElementById(
+            "accountsList"
+        );
+
+
+    const list =
+        Object.values(accounts);
+
+
+    container.innerHTML =
+        list.map(account=>`
+
+            <div
+                class="account-item ${
+                    account.id === currentAccountId
+                        ? "current"
+                        : ""
+                }"
+                onclick="switchAccount('${account.id}')"
+            >
+
+                <div class="account-info">
+
+                    <div class="account-name">
+                        ${escapeHtml(account.name)}
+                    </div>
+
+                    <div class="account-products">
+                        ${account.products?.length || 0} товаров
+                    </div>
+
+                </div>
+
+                <div>
+                    ${
+                        account.id === currentAccountId
+                            ? "✓"
+                            : "›"
+                    }
+                </div>
+
+            </div>
+
+        `).join("");
+}
+
+
+function switchAccount(id){
+
+    if(!accounts[id]) return;
+
+
+    currentAccountId =
+        id;
+
+    saveCurrentId();
+    loadCurrentAccount();
+
+    closeAccountsModal();
+
+    updateAll();
+
+    showPage("home");
+
+    showToast(
+        "Аккаунт переключён"
+    );
+}
+
+
+function createAccountFromApp(){
+
+    showToast("В первой версии доступен только один аккаунт");
+}
+
+
+/* =========================
+   THEME
+========================= */
+
+function applyTheme(theme){
+
+    let finalTheme =
+        theme;
+
+
+    if(theme === "system"){
+
+        finalTheme =
+            window.matchMedia(
+                "(prefers-color-scheme: light)"
+            ).matches
+                ? "light"
+                : "dark";
+
+    }
+
+
+    document.body.classList.toggle(
+        "light",
+        finalTheme === "light"
+    );
+}
+
+
+function setTheme(theme){
+
+    localStorage.setItem(
+        THEME_KEY,
+        theme
+    );
+
+
+    applyTheme(theme);
+
+    updateThemeButtons();
+}
+
+
+function updateThemeButtons(){
+
+    const theme =
+        localStorage.getItem(
+            THEME_KEY
+        ) || "dark";
+
+
+    document
+        .querySelectorAll(".theme-button")
+        .forEach(button =>
+            button.classList.toggle(
+                "active",
+                button.dataset.theme === theme
+            )
+        );
+}
+
+
+function initTheme(){
+
+    const theme =
+        localStorage.getItem(
+            THEME_KEY
+        ) || "dark";
+
+
+    applyTheme(theme);
+
+    updateThemeButtons();
+
+
+    window
+        .matchMedia(
+            "(prefers-color-scheme: light)"
+        )
+        .addEventListener(
+            "change",
+            ()=>{
+                if(
+                    localStorage.getItem(THEME_KEY)
+                    ===
+                    "system"
+                ){
+                    applyTheme("system");
+                }
+            }
+        );
+}
+
+
+/* =========================
+   EXPORT
+========================= */
+
+function exportCSV(){
+
+    if(!products.length){
+
+        showToast(
+            "Нет данных для экспорта"
+        );
+
+        return;
+    }
+
+
+    const rows = [
+
+        [
+            "Товар",
+            "Закуп",
+            "Продажа",
+            "Чистая прибыль",
+            "Продаж"
+        ]
+
+    ];
+
+
+    products.forEach(product=>{
+
+        rows.push([
+
+            product.name,
+
+            product.purchase,
+
+            product.sale,
+
+            getProfit(product),
+
+            getSalesCount(product)
+
+        ]);
+
+    });
+
+
+    const csv =
+        rows
+            .map(row =>
+                row
+                    .map(value =>
+                        `"${String(value)
+                            .replaceAll('"','""')}"`
+                    )
+                    .join(";")
+            )
+            .join("\n");
+
+
+    const blob =
+        new Blob(
+            ["\uFEFF" + csv],
+            {
+                type:"text/csv;charset=utf-8"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(blob);
+
+
+    const a =
+        document.createElement("a");
+
+
+    a.href = url;
+
+    a.download =
+        `dropflow_${localDateKey()}.csv`;
+
+    a.click();
+
+
+    URL.revokeObjectURL(url);
+
+    showToast(
+        "Экспорт готов"
+    );
+}
+
+
+/* =========================
+   BACKUP
+========================= */
+
+async function makeBackupChecksum(text){
+
+    if(window.crypto?.subtle){
+        const bytes = new TextEncoder().encode(text);
+        const hash = await crypto.subtle.digest("SHA-256", bytes);
+        return Array.from(new Uint8Array(hash))
+            .map(b => b.toString(16).padStart(2,"0"))
+            .join("");
+    }
+
+    // Запасной checksum для открытия обычным HTML-файлом без Web Crypto.
+    let h1 = 2166136261;
+    for(let i=0;i<text.length;i++){
+        h1 ^= text.charCodeAt(i);
+        h1 = Math.imul(h1,16777619);
+    }
+    return "fnv1a-" + (h1 >>> 0).toString(16).padStart(8,"0");
+}
+
+async function verifyBackupChecksum(text, expected, algorithm){
+    if(algorithm === "FNV-1a" || String(expected).startsWith("fnv1a-")){
+        return makeFNV1aChecksum(text) === expected;
+    }
+
+    if(algorithm === "SHA-256" || !algorithm){
+        return (await makeBackupChecksum(text)) === expected;
+    }
+
+    return false;
+}
+
+function makeFNV1aChecksum(text){
+    let h1 = 2166136261;
+    for(let i=0;i<text.length;i++){
+        h1 ^= text.charCodeAt(i);
+        h1 = Math.imul(h1,16777619);
+    }
+    return "fnv1a-" + (h1 >>> 0).toString(16).padStart(8,"0");
+}
+
+function normalizeBackupAccount(source){
+
+    if(!source || typeof source !== "object") throw new Error("account");
+
+    const account = {
+        id: String(source.id || "account_1"),
+        name: String(source.name || "Пользователь"),
+        password: String(source.password || ""),
+        createdAt: String(source.createdAt || localDateKey()),
+        avatar: String(source.avatar || ""),
+        products: Array.isArray(source.products) ? source.products.map(p => ({
+            id: String(p?.id || ("product_" + Date.now() + "_" + Math.random().toString(36).slice(2,8))),
+            name: String(p?.name || ""),
+            purchase: parseNumber(p?.purchase),
+            sale: parseNumber(p?.sale),
+            commission: parseNumber(p?.commission),
+            delivery: parseNumber(p?.delivery),
+            createdDate: String(p?.createdDate || localDateKey()),
+            photo: typeof p?.photo === "string" ? p.photo : "",
+            description: String(p?.description || ""),
+            salesHistory: Array.isArray(p?.salesHistory) ? p.salesHistory.map(s => ({
+                id: String(s?.id || ("sale_" + Date.now() + "_" + Math.random().toString(36).slice(2,8))),
+                date: String(s?.date || localDateKey())
+            })) : []
+        })) : []
+    };
+
+    if(!account.name) throw new Error("name");
+    return account;
+}
+
+async function backupData(){
+
+    const account = getCurrentAccount();
+    if(!account){
+        showToast("Сначала войди в аккаунт");
+        return;
+    }
+
+    /* Перед экспортом убеждаемся, что текущие медиа уже в памяти приложения. */
+    try{
+        if(mediaStorageReady){
+            await saveMediaStore();
+        }
+    }catch(error){
+        console.error(error);
+    }
+
+    const payload = {
+        account: normalizeBackupAccount(account),
+        settings: {
+            theme: localStorage.getItem(THEME_KEY) || "dark",
+            currentPeriod,
+            currentMetric
+        }
+    };
+
+    const canonical = JSON.stringify(payload);
+    const checksum = await makeBackupChecksum(canonical);
+
+    const backup = {
+        format: "dropflow-backup",
+        formatVersion: 1,
+        schemaVersion: 1,
+        app: "DropFlow",
+        appVersion: "1.0.0",
+        exportedAt: new Date().toISOString(),
+        checksumAlgorithm: checksum.startsWith("fnv1a-") ? "FNV-1a" : "SHA-256",
+        checksum,
+        payload
+    };
+
+    const text = JSON.stringify(backup,null,2);
+    const blob = new Blob([text],{type:"application/json"});
+    const fileName = `dropflow_backup_v1_${localDateKey()}.json`;
+
+    /*
+       На iPhone сначала используем системное меню «Поделиться».
+       Так файл можно сразу сохранить в «Файлы», отправить в Telegram
+       или сохранить в другое место. Для старых браузеров остаётся
+       обычная загрузка через ссылку.
+    */
+    try{
+        if(navigator.share && typeof File !== "undefined"){
+            const file = new File([blob],fileName,{type:"application/json"});
+            if(!navigator.canShare || navigator.canShare({files:[file]})){
+                await navigator.share({files:[file],title:"DropFlow — резервная копия"});
+                showToast("Резервная копия готова");
+                return;
+            }
+        }
+    }catch(error){
+        if(error?.name === "AbortError") return;
+        console.error(error);
+    }
+
+    try{
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        a.rel = "noopener";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(()=>URL.revokeObjectURL(url),1500);
+        showToast("Резервная копия создана");
+    }catch(error){
+        console.error(error);
+        showToast("Не удалось создать резервную копию");
+    }
+}
+
+function migrateBackup(backup){
+
+    // Будущий код миграции добавляется сюда. Старые форматы не удаляем.
+    if(backup?.format === "dropflow-backup" && backup.payload){
+        if(Number(backup.schemaVersion) !== 1){
+            throw new Error("unsupported-schema");
+        }
+        return backup.payload;
+    }
+
+    // Поддержка старых backup DropFlow, созданных до V1.
+    if(backup?.app === "DropFlow" && backup.account){
+        return {
+            account: backup.account,
+            settings: {
+                theme: localStorage.getItem(THEME_KEY) || "dark",
+                currentPeriod: 7,
+                currentMetric: "sales"
+            }
+        };
+    }
+
+    throw new Error("unknown-format");
+}
+
+async function readBackupFile(file){
+    if(typeof file.text === "function"){
+        return await file.text();
+    }
+
+    return await new Promise((resolve,reject)=>{
+        const reader = new FileReader();
+        reader.onload = ()=>resolve(String(reader.result || ""));
+        reader.onerror = ()=>reject(reader.error || new Error("file-read"));
+        reader.readAsText(file);
+    });
+}
+
+async function restoreData(event){
+
+    const file = event.target.files?.[0];
+    if(!file) return;
+
+    try{
+        const text = await readBackupFile(file);
+        const backup = JSON.parse(text);
+        const payload = migrateBackup(backup);
+
+        if(backup.format === "dropflow-backup"){
+            const canonical = JSON.stringify(backup.payload);
+            const valid = await verifyBackupChecksum(
+                canonical,
+                backup.checksum,
+                backup.checksumAlgorithm
+            );
+
+            if(!valid){
+                throw new Error("checksum");
+            }
+        }
+
+        const restored = normalizeBackupAccount(payload.account);
+        if(!restored.id) throw new Error("account");
+
+        /*
+           Авторизацию владельца НЕ трогаем. Восстановление данных
+           не должно снова заставлять владельца вводить пароль.
+        */
+        const existingId = currentAccountId || restored.id || "account_1";
+        restored.id = existingId;
+
+        accounts = {};
+        accounts[existingId] = restored;
+        currentAccountId = existingId;
+
+        if(payload.settings?.theme){
+            localStorage.setItem(THEME_KEY,payload.settings.theme);
+        }
+
+        const saved = saveAccounts();
+        if(!saved) throw new Error("storage");
+
+        /* Ждём фактическую запись аватара и фотографий в IndexedDB,
+           только если IndexedDB действительно доступна. */
+        if(mediaStorageReady){
+            await saveMediaStore();
+        }
+
+        saveCurrentId();
+        loadCurrentAccount();
+        initTheme();
+        updateAll();
+        showPage("home");
+        showToast("Резервная копия успешно восстановлена");
+
+    }catch(error){
+        console.error(error);
+        showToast(
+            error.message === "checksum"
+                ? "Резервная копия повреждена"
+                : "Не удалось восстановить резервную копию"
+        );
+    }finally{
+        event.target.value = "";
+    }
+}
+
+/* =========================
+   DELETE
+========================= */
+
+function deleteAllCurrentData(){
+
+    if(
+        !confirm(
+            "Удалить все товары и историю продаж?"
+        )
+    ){
+        return;
+    }
+
+
+    products = [];
+
+    saveProducts();
+
+    updateAll();
+
+    showPage("home");
+
+    showToast(
+        "Данные удалены"
+    );
+}
+
+
+function deleteCurrentAccount(){
+
+    const account =
+        getCurrentAccount();
+
+
+    if(!account) return;
+
+
+    if(
+        !confirm(
+            `Удалить аккаунт «${account.name}»?`
+        )
+    ){
+        return;
+    }
+
+
+    delete accounts[
+        currentAccountId
+    ];
+
+
+    saveAccounts();
+
+
+    const remaining =
+        Object.values(accounts);
+
+
+    if(remaining.length){
+
+        currentAccountId =
+            remaining[0].id;
+
+        saveCurrentId();
+
+        loadCurrentAccount();
+
+        updateAll();
+
+        showPage("home");
+
+    }else{
+
+        currentAccountId =
+            null;
+
+        saveCurrentId();
+
+        products = [];
+
+        showLogin();
+
+    }
+
+
+    showToast(
+        "Аккаунт удалён"
+    );
+}
+
+
+function logout(){
+
+    setOwnerAuthorized(false);
+    currentAccountId = null;
+
+    saveCurrentId();
+
+    products = [];
+
+    showLogin();
+
+    showToast(
+        "Вы вышли"
+    );
+}
+
+
+/* =========================
+   UPDATE
+========================= */
+
+function updateAll(){
+
+    updateDashboard();
+    renderProducts();
+    renderStatistics();
+    renderAccount();
+    updateThemeButtons();
+}
+
+
+/* =========================
+   TOAST
+========================= */
+
+function showToast(message){
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+
+    toast.textContent =
+        message;
+
+
+    toast.classList.add("show");
+
+
+    clearTimeout(
+        toastTimer
+    );
+
+
+    toastTimer =
+        setTimeout(
+            ()=>{
+                toast.classList.remove(
+                    "show"
+                );
+            },
+            2200
+        );
+}
+
+
+/* =========================
+   CLOSE MODALS
+========================= */
+
+[
+    ["productOverlay",closeProductModal],
+    ["historyOverlay",closeHistory],
+    ["accountsOverlay",closeAccountsModal],
+    ["profileOverlay",closeProfileModal]
+].forEach(([id,fn])=>{
+
+    document
+        .getElementById(id)
+        .addEventListener(
+            "click",
+            function(e){
+
+                if(e.target === this){
+                    fn();
+                }
+
+            }
+        );
+
+});
+
+
+/* =========================
+   INIT
+========================= */
+
+(async function(){
+
+    loadAccounts();
+
+    /*
+       Переносим старые фото из localStorage в IndexedDB и затем
+       загружаем медиаданные. После этого интерфейс строится уже
+       только из полностью восстановленных данных.
+    */
+    try{
+        /*
+           ВАЖНО: сначала читаем IndexedDB, и только потом что-либо
+           записываем. Иначе при повторном открытии iPhone localStorage
+           содержит компактную запись без фото, и прежний saveMediaStore()
+           мог очистить IndexedDB до загрузки фотографий.
+        */
+        await loadMediaStore();
+
+        /* Только после успешного чтения IndexedDB обновляем её содержимое.
+           Если IndexedDB недоступна, медиа остаются в localStorage. */
+        if(mediaStorageReady){
+            await saveMediaStore();
+        }
+    }catch(error){
+        console.error(error);
+    }
+
+    initTheme();
+
+    /* Сначала восстанавливаем постоянную авторизацию, затем показываем экран. */
+    await loadPersistentOwnerAuthorization();
+
+    if(isOwnerAuthorized()){
+        if(currentAccountId && accounts[currentAccountId]){
+            loadCurrentAccount();
+        }else if(Object.keys(accounts).length){
+            const first = Object.values(accounts)[0];
+            currentAccountId = first.id;
+            loadCurrentAccount();
+            saveCurrentId();
+        }else{
+            ensureOwnerAccount();
+            saveCurrentId();
+            loadCurrentAccount();
+        }
+
+        updateAll();
+        showPage("home");
+    }else{
+        showLogin();
+        const loginInput = document.getElementById("loginPassword");
+        if(loginInput) setTimeout(()=>loginInput.focus(),50);
+    }
+
+})();
+</script>
+
+
+<script>
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js', {scope:'./'}).catch(err => console.warn('DropFlow SW:', err));
+  });
+}
+</script>
+</body>
+</html>
