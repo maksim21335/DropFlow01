@@ -1899,10 +1899,12 @@ textarea.field{
 
             <div class="profile glass">
 
-                <button
-                    type="button"
+                <div
                     class="profile-top profile-edit-trigger"
+                    role="button"
+                    tabindex="0"
                     onclick="editProfile()"
+                    onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();editProfile()}"
                     aria-label="Редактировать профиль"
                 >
 
@@ -1938,7 +1940,7 @@ textarea.field{
 
                     </div>
 
-                </button>
+                </div>
 
 
                 <div class="profile-stats">
@@ -2040,10 +2042,12 @@ textarea.field{
 
                 <div class="settings">
 
-                    <button
-                        type="button"
+                    <div
                         class="setting glass"
+                        role="button"
+                        tabindex="0"
                         onclick="editProfile()"
+                        onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();editProfile()}"
                         aria-label="Открыть редактирование профиля"
                     >
                         <div>
@@ -2059,7 +2063,7 @@ textarea.field{
                         <div class="setting-arrow">
                             ›
                         </div>
-                    </button>
+                    </div>
 
 
                     <div
