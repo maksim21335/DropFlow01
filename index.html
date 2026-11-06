@@ -1402,51 +1402,6 @@ textarea.field{
 
 <body>
 
-<!-- LOGIN -->
-
-<section id="loginScreen" class="login-screen">
-
-    <div id="loginBox" class="login-box glass">
-
-        <div class="logo">DropFlow</div>
-
-        <h1 class="login-title" id="loginTitle">
-            Введите пароль
-        </h1>
-
-        <p class="login-subtitle" id="loginSubtitle">
-            Пароль предоставлен владельцем приложения.
-        </p>
-
-        <form id="loginForm">
-
-            <div class="form-group">
-                <label class="form-label">Пароль доступа</label>
-                <input
-                    class="field"
-                    id="loginPassword"
-                    type="password"
-                    autocomplete="off"
-                    placeholder="Введите пароль"
-                    required
-                >
-            </div>
-
-            <button
-                class="primary-btn"
-                type="submit"
-                id="loginButton"
-            >
-                Войти
-            </button>
-
-        </form>
-
-    </div>
-
-</section>
-
-
 <!-- APP -->
 
 <div id="app" class="hidden">
@@ -3024,30 +2979,15 @@ function saveProducts(){
 
 function showLogin(){
 
-    document
-        .getElementById("loginScreen")
-        .classList.remove("hidden");
-
-    document
-        .getElementById("app")
-        .classList.add("hidden");
+    // Авторизация отключена: приложение всегда доступно без пароля.
+    document.getElementById("app").classList.remove("hidden");
 }
 
 
 function hideLogin(){
 
-    document
-        .getElementById("loginScreen")
-        .classList.add("hidden");
-
-    document
-        .getElementById("app")
-        .classList.remove("hidden");
+    document.getElementById("app").classList.remove("hidden");
 }
-
-
-const OWNER_ACCESS_PASSWORD = "dropFlow-01-01";
-const OWNER_AUTH_KEY = "dropflow_owner_authorized_v1";
 
 function ensureOwnerAccount(){
 
@@ -3079,37 +3019,6 @@ function ensureOwnerAccount(){
     saveAccounts();
     return accounts[id];
 }
-
-document
-    .getElementById("loginForm")
-    .addEventListener("submit",function(e){
-
-        e.preventDefault();
-
-        const password =
-            document
-                .getElementById("loginPassword")
-                .value;
-
-        if(password !== OWNER_ACCESS_PASSWORD){
-            showToast("Неверный пароль");
-            return;
-        }
-
-        // После успешного первого входа запоминаем авторизацию только на этом устройстве.
-        localStorage.setItem(OWNER_AUTH_KEY, "1");
-
-        const account = ensureOwnerAccount();
-        currentAccountId = account.id;
-        saveCurrentId();
-        loadCurrentAccount();
-
-        document.getElementById("loginPassword").value = "";
-        hideLogin();
-        updateAll();
-        showPage("home");
-        showToast("Вход выполнен");
-    });
 
 /* =========================
    NAVIGATION
@@ -5485,14 +5394,15 @@ function deleteCurrentAccount(){
 
     }else{
 
-        currentAccountId =
-            null;
-
+        currentAccountId = null;
         saveCurrentId();
 
-        products = [];
-
-        showLogin();
+        const account = ensureOwnerAccount();
+        currentAccountId = account.id;
+        saveCurrentId();
+        loadCurrentAccount();
+        updateAll();
+        showPage("home");
 
     }
 
@@ -5505,20 +5415,8 @@ function deleteCurrentAccount(){
 
 function logout(){
 
-    // Полный выход сбрасывает запомненную авторизацию устройства.
-    localStorage.removeItem(OWNER_AUTH_KEY);
-
-    currentAccountId = null;
-
-    saveCurrentId();
-
-    products = [];
-
-    showLogin();
-
-    showToast(
-        "Вы вышли"
-    );
+    // Вход без пароля: выход не блокирует доступ к приложению.
+    showToast("Приложение доступно без пароля");
 }
 
 
@@ -5610,24 +5508,23 @@ function showToast(message){
     initTheme();
 
 
-    // При первом запуске требуется пароль владельца.
-    // После успешного входа авторизация сохраняется на этом устройстве.
+    // Приложение запускается сразу, без запроса пароля.
     if(currentAccountId && accounts[currentAccountId]){
         loadCurrentAccount();
     }else if(Object.keys(accounts).length){
         const first = Object.values(accounts)[0];
         currentAccountId = first.id;
         loadCurrentAccount();
+    }else{
+        const account = ensureOwnerAccount();
+        currentAccountId = account.id;
+        saveCurrentId();
+        loadCurrentAccount();
     }
 
-    if(localStorage.getItem(OWNER_AUTH_KEY) === "1"){
-        hideLogin();
-        updateAll();
-        showPage("home");
-    }else{
-        showLogin();
-        document.getElementById("loginPassword").focus();
-    }
+    hideLogin();
+    updateAll();
+    showPage("home");
 
 })();
 </script>
