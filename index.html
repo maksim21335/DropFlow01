@@ -2690,6 +2690,7 @@ let historyProductId = null;
 
 let tempPhoto = "";
 let tempAvatar = "";
+let photoProcessing = false;
 let toastTimer;
 
 
@@ -3641,6 +3642,7 @@ function openAddModal(){
 
 
     tempPhoto = "";
+    photoProcessing = false;
 
 
     document
@@ -3710,6 +3712,7 @@ function editProduct(id){
 
     tempPhoto =
         product.photo || "";
+    photoProcessing = false;
 
 
     document.getElementById(
@@ -3735,6 +3738,10 @@ document
 
         e.preventDefault();
 
+        if(photoProcessing){
+            showToast("Подожди, фотография ещё обрабатывается");
+            return;
+        }
 
         const id =
             document
@@ -3877,6 +3884,9 @@ function previewPhoto(event){
        уменьшается. Интерфейс при этом не меняется.
     */
 
+    photoProcessing = true;
+    tempPhoto = "";
+
     const reader =
         new FileReader();
 
@@ -3941,11 +3951,14 @@ function previewPhoto(event){
                 .innerHTML =
                 `<img src="${tempPhoto}">`;
 
+            photoProcessing = false;
+
         };
 
 
         image.onerror = ()=>{
 
+            photoProcessing = false;
             showToast(
                 "Не удалось обработать фото"
             );
@@ -3960,12 +3973,18 @@ function previewPhoto(event){
 
     reader.onerror = ()=>{
 
+        photoProcessing = false;
         showToast(
             "Не удалось загрузить фото"
         );
 
     };
 
+
+    reader.onabort = ()=>{
+        photoProcessing = false;
+        showToast("Загрузка фотографии отменена");
+    };
 
     reader.readAsDataURL(file);
 }
