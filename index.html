@@ -742,6 +742,17 @@ textarea.field{
     display:flex;
     align-items:center;
     gap:13px;
+    width:100%;
+    text-align:left;
+    color:inherit;
+    background:transparent;
+    border:0;
+    cursor:pointer;
+}
+.profile-edit-trigger:focus-visible,
+.setting:focus-visible{
+    outline:2px solid var(--blue);
+    outline-offset:3px;
 }
 
 .profile-avatar{
@@ -1888,7 +1899,12 @@ textarea.field{
 
             <div class="profile glass">
 
-                <div class="profile-top">
+                <button
+                    type="button"
+                    class="profile-top profile-edit-trigger"
+                    onclick="editProfile()"
+                    aria-label="Редактировать профиль"
+                >
 
                     <div class="profile-avatar">
 
@@ -1922,7 +1938,7 @@ textarea.field{
 
                     </div>
 
-                </div>
+                </button>
 
 
                 <div class="profile-stats">
@@ -2024,9 +2040,11 @@ textarea.field{
 
                 <div class="settings">
 
-                    <div
+                    <button
+                        type="button"
                         class="setting glass"
                         onclick="editProfile()"
+                        aria-label="Открыть редактирование профиля"
                     >
                         <div>
                             <div class="setting-title">
@@ -2041,7 +2059,7 @@ textarea.field{
                         <div class="setting-arrow">
                             ›
                         </div>
-                    </div>
+                    </button>
 
 
                     <div
@@ -2954,22 +2972,34 @@ function loadCurrentAccount(){
 
 function saveProducts(){
 
-    const account =
-        getCurrentAccount();
+    let account = getCurrentAccount();
 
-    if(!account) return false;
+    if(!account){
+        account = ensureOwnerAccount();
+        currentAccountId = account.id;
+        saveCurrentId();
+        loadCurrentAccount();
+    }
 
-    const previous = account.products;
+    if(!account){
+        showToast("Не удалось открыть аккаунт для сохранения");
+        return false;
+    }
+
+    if(!Array.isArray(products)){
+        products = [];
+    }
+
     account.products = products;
 
     const saved = saveAccounts();
 
     if(!saved){
-        account.products = previous;
-        products = previous || [];
+        showToast("Товар не сохранён. Освободи место в памяти браузера и попробуй снова.");
+        return false;
     }
 
-    return saved;
+    return true;
 }
 
 
@@ -3855,7 +3885,8 @@ function previewPhoto(event){
 
         image.onload = ()=>{
 
-            const maxSide = 1200;
+            // Уменьшаем фото, чтобы не переполнять хранилище браузера.
+            const maxSide = 900;
 
             let width = image.naturalWidth;
             let height = image.naturalHeight;
@@ -3897,7 +3928,7 @@ function previewPhoto(event){
             tempPhoto =
                 canvas.toDataURL(
                     "image/jpeg",
-                    0.78
+                    0.68
                 );
 
 
@@ -4736,11 +4767,16 @@ function renderAccount(){
 function editProfile(){
 
     const account =
-        getCurrentAccount();
+        getCurrentAccount() || ensureOwnerAccount();
 
 
-    if(!account) return;
+    if(!account){
+        showToast("Не удалось открыть профиль");
+        return;
+    }
 
+    currentAccountId = account.id;
+    saveCurrentId();
 
     document.getElementById(
         "editName"
@@ -4783,10 +4819,10 @@ function previewAvatar(event){
     if(!file) return;
 
 
-    if(file.size > 3 * 1024 * 1024){
+    if(file.size > 8 * 1024 * 1024){
 
         showToast(
-            "Файл слишком большой"
+            "Фото больше 8 МБ. Выбери изображение поменьше."
         );
 
         return;
